@@ -1,0 +1,63 @@
+{
+  "generated": "2025-04-28T16:14:11.933Z",
+  "packages": [
+    {
+      "package": "backend",
+      "generated": "2025-04-28T16:14:11.932Z",
+      "shared": [
+        {
+          "name": "core",
+          "path": "packages/backend/core",
+          "intent": "No intent specified",
+          "stability": "Experimental",
+          "owner": "Unassigned",
+          "files": [
+            "core/README_core.md",
+            "core/_template/README_context.md"
+          ]
+        },
+        {
+          "name": "adapters",
+          "path": "packages/backend/adapters",
+          "intent": "No intent specified",
+          "stability": "Experimental",
+          "owner": "Unassigned",
+          "files": [
+            "adapters/README_adapters.md"
+          ]
+        }
+      ],
+      "features": []
+    },
+    {
+      "package": "frontend",
+      "generated": "2025-04-28T16:14:11.933Z",
+      "shared": [
+        {
+          "name": "shared",
+          "path": "packages/frontend/src/shared",
+          "intent": "No intent specified",
+          "stability": "Experimental",
+          "owner": "Unassigned",
+          "files": [
+            "shared/README_shared.md"
+          ]
+        },
+        {
+          "name": "app",
+          "path": "packages/frontend/src/app",
+          "intent": "No intent specified",
+          "stability": "Experimental",
+          "owner": "Unassigned",
+          "files": [
+            "app/README_app.md",
+            "app/test-ui/README_test-ui.md",
+            "app/test-ui/index.ts",
+            "app/test-ui/types.ts"
+          ]
+        }
+      ],
+      "features": []
+    }
+  ]
+}

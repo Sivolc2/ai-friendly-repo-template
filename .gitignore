@@ -1,0 +1,167 @@
+# --- Global ---
+.DS_Store
+.env
+.env.*
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg-info/
+*.egg
+*.log
+*.sqlite3
+*.db
+*.tmp
+*.bak
+*.swp
+
+# Python environments
+.venv/
+venv/
+ENV/
+env/
+
+# pytest
+.cache/
+.pytest_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# mypy
+.mypy_cache/
+.dmypy.json
+.pyre/
+
+# --- React / Node ---
+node_modules/
+dist/
+build/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Vite / CRA
+.vite/
+.cache/
+*.tsbuildinfo
+
+# --- IDEs / Editors ---
+.vscode/
+.idea/
+*.code-workspace
+
+# --- OS files ---
+Thumbs.db
+ehthumbs.db
+desktop.ini
+repo_contents.txt
+
+framework-zero/backend/uploads/artifacts
+
+# Python virtual environments
+venv/
+env/
+.venv/
+virtualenv/
+infra/venv/
+**/.env
+.python-version
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Node modules and build directories
+node_modules/
+dist/
+build/
+.next/
+.nuxt/
+.cache/
+coverage/
+
+# Editor/IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Build artifacts
+*.so
+*.dylib
+*.dll
+*.exe
+
+# Database files
+*.sqlite3
+*.db
+
+# OS generated files
+Thumbs.db
+.DS_Store
+.directory
+
+# Generated files
+docs/living_context/*.md
+
+# Keep .gitkeep files
+!**/.gitkeep
+# Python virtual environments
+venv/
+env/
+.env/
+.venv/
+ENV/
+env.bak/
+venv.bak/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.pytest_cache/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# TypeScript
+*.tsbuildinfo
+
+# Package directories at any level
+**/node_modules/
+**/dist/
+**/build/
+**/.next/
+**/.nuxt/
+**/.cache/
+**/coverage/
+
+# Temporary files at any level
+**/tmp/
+**/temp/
+**/.tmp/
+**/.temp/
+
+# Logs at any level
+**/logs/
+**/*.log
