@@ -64,6 +64,9 @@ This repository is structured as a monorepo with a clean separation between pure
 ```bash
 # Install dependencies
 pnpm install              # Frontend dependencies
+
+# Set up Python environment
+python -m venv .venv      # Create Python virtual environment
 source .venv/bin/activate # Activate Python virtual environment
 pip install -r packages/backend/requirements.txt
 
