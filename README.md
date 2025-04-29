@@ -2,6 +2,23 @@
 
 A framework for collaborative content creation and management with an AI-driven, functional-core architecture.
 
+## 🤖 How to Use This Repository with AI
+
+This repository is designed for effective human-AI collaboration. Follow this process:
+
+### Contributing with AI Assistance
+1. **Add documentation first**: Create or update guides in `docs/guides/` to document new features or processes
+2. **Prompt the AI model with**:
+   - `docs/feature_flow.md` - Shows the process for contributing (update as workflows evolve)
+   - Registry context files in `registry/` (backend_context.md, frontend_context.md)
+3. **Use README files** in each folder as guidance for your contributions
+4. **Develop iteratively**: Test features after implementing and check for output
+
+### Best Practices
+- **Encode business logic in pipelines**: Expand pipeline documentation to capture domain knowledge
+- **Update documentation as you code**: Have your AI assistant update docs as pipelines are implemented
+- **Follow testing patterns**: Use the established testing harness for both frontend and backend
+
 ## 📋 Overview
 
 This repository is structured as a monorepo with a clean separation between pure functions (functional core) and side effects (adapters/IO). This architecture makes it particularly friendly for AI-assisted development and reasoning.
@@ -19,6 +36,7 @@ This repository is structured as a monorepo with a clean separation between pure
 │   │   ├── tests/         # unit and integration tests
 │   │   ├── utils/         # generic helpers
 │   │   ├── main.py        # entrypoint
+│   │   └── README_backend.md
 │   ├── frontend           # React/TypeScript frontend
 │   │   ├── src/
 │   │   │   ├── components/  # reusable UI components
@@ -49,6 +67,10 @@ pnpm install              # Frontend dependencies
 source .venv/bin/activate # Activate Python virtual environment
 pip install -r packages/backend/requirements.txt
 
+# Set up environment variables
+cp .env.defaults packages/frontend/.env
+cp .env.defaults packages/backend/.env
+
 # Run development servers
 pnpm --filter frontend dev      # Start Vite dev server
 uvicorn packages.backend.main:app --reload  # Start backend server
@@ -56,10 +78,22 @@ uvicorn packages.backend.main:app --reload  # Start backend server
 # Development workflow
 pnpm lint                # Run linters
 pnpm typecheck           # Run type checking
-pnpm test                # Run tests
+pnpm test                # Run tests for both frontend and backend
+pnpm e2e                 # Run end-to-end tests with Playwright
+pnpm ci                  # Run lint, typecheck, and tests (CI pipeline)
 pnpm ctx:sync            # Update documentation
 pnpm diagrams:generate   # Generate function & pipeline diagrams
 ```
+
+## 🧪 Testing
+
+This project uses a comprehensive testing harness that allows running all tests with a single command while keeping each language's tooling isolated:
+
+- **Frontend**: Vitest + React Testing Library
+- **Backend**: pytest + hypothesis
+- **E2E**: Playwright
+
+See [README.testing.md](README.testing.md) for detailed information about the testing setup.
 
 ## 📝 Development Flow
 
