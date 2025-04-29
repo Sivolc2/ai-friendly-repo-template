@@ -62,8 +62,6 @@ ehthumbs.db
 desktop.ini
 repo_contents.txt
 
-framework-zero/backend/uploads/artifacts
-
 # Python virtual environments
 venv/
 env/

@@ -1,130 +1,106 @@
-## Quick Start
+# AI-Friendly Repository Template
 
-```bash
-# Install dependencies
-pnpm install
+A framework for collaborative content creation and management with an AI-driven, functional-core architecture.
 
-# Start development servers
-pnpm dev
+## 📋 Overview
 
-# Run tests
-pnpm test
+This repository is structured as a monorepo with a clean separation between pure functions (functional core) and side effects (adapters/IO). This architecture makes it particularly friendly for AI-assisted development and reasoning.
 
-# Generate documentation
-pnpm gen:context
-```
-
-## Project Structure
+## 🏗️ Project Structure
 
 ```
 .
-├── docs/                    # Project documentation
-│   ├── 00_project_vision.md    # Project vision and goals
-│   ├── 01_architecture_overview.md  # System architecture
-│   ├── 02_rules_of_change.md   # Development rules
-│   ├── 03_shared_code_rules.md # Shared code guidelines
-│   └── 04_feature_implementation_rules.md # Feature development guide
-├── packages/
-│   ├── backend/            # Backend services
-│   │   ├── core/          # Core functionality
-│   │   ├── adapters/      # External integrations
-│   │   └── modules/       # Feature modules
-│   └── frontend/          # Frontend application
-│       └── src/
-│           ├── app/       # Application shell
-│           ├── shared/    # Shared components
-│           └── features/  # Feature modules
-└── registry/              # Generated documentation
+├── packages
+│   ├── backend            # Python backend with functional core
+│   │   ├── adapters/      # DB / HTTP side-effect wrappers
+│   │   ├── data/          # immutable schemas/constants
+│   │   ├── functions/     # pure functions
+│   │   ├── pipelines/     # orchestration layers
+│   │   ├── tests/         # unit and integration tests
+│   │   ├── utils/         # generic helpers
+│   │   ├── main.py        # entrypoint
+│   ├── frontend           # React/TypeScript frontend
+│   │   ├── src/
+│   │   │   ├── components/  # reusable UI components
+│   │   │   ├── hooks/       # custom React hooks
+│   │   │   ├── pages/       # route-level components
+│   │   │   ├── services/    # API clients and services
+│   │   │   ├── types/       # TypeScript type definitions
+│   │   │   └── utils/       # utility functions
+│   │   └── README_frontend.md
+│   ├── scripts            # developer tooling and utilities
+│   └── shared             # shared types and utilities
+│       └── README_shared.md
+├── docs
+│   ├── adr/             # architecture decision records
+│   ├── diagrams/        # system and component diagrams
+│   ├── pipelines/       # auto-generated pipeline documentation
+│   ├── prd/             # product requirements documents
+│   └── README_*.md      # documentation guides
+├── registry/            # auto-generated documentation and indexes
+└── .github/workflows    # CI/CD configuration
 ```
 
-## Key Commands
+## 🚀 Quick Start
 
-### Development
 ```bash
-# Start development servers
-pnpm dev
+# Install dependencies
+pnpm install              # Frontend dependencies
+source .venv/bin/activate # Activate Python virtual environment
+pip install -r packages/backend/requirements.txt
 
-# Start backend only
-pnpm dev:backend
+# Run development servers
+pnpm --filter frontend dev      # Start Vite dev server
+uvicorn packages.backend.main:app --reload  # Start backend server
 
-# Start frontend only
-pnpm dev:frontend
+# Development workflow
+pnpm lint                # Run linters
+pnpm typecheck           # Run type checking
+pnpm test                # Run tests
+pnpm ctx:sync            # Update documentation
+pnpm diagrams:generate   # Generate function & pipeline diagrams
 ```
 
-### Feature Development
+## 📝 Development Flow
+
+See [docs/feature_flow.md](docs/feature_flow.md) for the step-by-step process for adding new features.
+
+## 📚 Documentation
+
+Each directory contains a README file with specific guidance for that component.
+
+### Registry
+
+The [registry](registry/) directory contains auto-generated documentation and indexes that provide AI-friendly context:
+
+- **backend_context.md**: Concise index of backend functionality
+- **frontend_context.md**: Concise index of frontend components and functions
+- **pipeline_context.md**: Summary of all pipelines in the application
+- **context.json**: Machine-readable metadata for AI tools
+
+To update the registry:
+
 ```bash
-# Create new feature
-pnpm new-feature <backend|frontend> <feature-name>
-
-# Generate documentation
-pnpm gen:context <backend|frontend>
-
-# Update system diagram
-pnpm update:diagram
+pnpm ctx:sync
 ```
 
-### Testing
+### Diagrams
+
+The [docs/diagrams](docs/diagrams/) directory contains automatically generated diagrams that visualize:
+
+- **Function Overview**: All functions from the `functions/` directory grouped by module
+- **Pipeline Diagrams**: Individual pipeline functions and their relationships
+
+To generate or update diagrams:
+
 ```bash
-# Run all tests
-pnpm test
-
-# Run backend tests
-pnpm test:backend
-
-# Run frontend tests
-pnpm test:frontend
+pnpm diagrams:generate
 ```
 
-## Documentation Guide
+## 🔄 CI/CD
 
-### For New Developers
-1. Start with `docs/00_project_vision.md` to understand the project goals
-2. Read `docs/01_architecture_overview.md` for system architecture
-3. Review `docs/02_rules_of_change.md` for development guidelines
+The project uses GitHub Actions for continuous integration and deployment.
 
-### For Feature Development
-1. Read `docs/04_feature_implementation_rules.md` for feature development process
-2. Review the appropriate implementation guide:
-   - Backend: `packages/backend/README_implementation_guide.md`
-   - Frontend: `packages/frontend/README_implementation_guide.md`
+## 📄 License
 
-### For Shared Code Changes
-1. Read `docs/03_shared_code_rules.md` for shared code guidelines
-2. Review the appropriate module's README:
-   - Backend Core: `packages/backend/core/README_core.md`
-   - Backend Adapters: `packages/backend/adapters/README_adapters.md`
-   - Frontend App: `packages/frontend/src/app/README_app.md`
-   - Frontend Shared: `packages/frontend/src/shared/README_shared.md`
-
-## Development Workflow
-
-1. **Create Feature**
-   ```bash
-   pnpm new-feature <backend|frontend> <feature-name>
-   ```
-
-2. **Implement Feature**
-   - Follow the implementation guide
-   - Write tests
-   - Update documentation
-
-3. **Generate Documentation**
-   ```bash
-   pnpm gen:context <backend|frontend>
-   ```
-
-4. **Submit PR**
-   - Include documentation updates
-   - Link to relevant ADRs if needed
-   - Ensure tests pass
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Follow the development workflow
-4. Submit a pull request
-
-## License
-
-[Add your license information here] 
+ISC

@@ -1,21 +1,30 @@
 {
-  "name": "collective_creation_engine",
+  "name": "example-llm-developer-project",
   "version": "1.0.0",
   "description": "A framework for collaborative content creation and management",
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "new-feature": "ts-node scripts/new-feature.mts",
-    "gen:context": "ts-node scripts/gen_context.mts",
-    "update:diagram": "ts-node scripts/update_system_diagram.mts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "ctx:sync": "python packages/scripts/export_context.py",
+    "registry:update": "pnpm ctx:sync",
+    "diagrams:generate": "python packages/scripts/generate_diagrams.py",
+    "lint": "pnpm -r run lint",
+    "typecheck": "pnpm -r run typecheck",
+    "test": "pnpm -r --parallel run test",
+    "coverage": "pnpm -r --parallel run coverage",
+    "e2e": "concurrently -k \"pnpm --filter frontend run dev\" \"uvicorn packages.backend.main:app --reload\" \"playwright test\"",
+    "ci": "pnpm lint && pnpm typecheck && pnpm test",
+    "docs:serve": "mkdocs serve",
+    "docs:build": "mkdocs build"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.9.0",
   "devDependencies": {
+    "@playwright/test": "^1.42.1",
     "@types/node": "^22.15.3",
+    "concurrently": "^8.2.2",
     "prettier": "^3.5.3",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"

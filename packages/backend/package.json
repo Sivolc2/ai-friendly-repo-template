@@ -1,0 +1,9 @@
+{
+  "name": "@workspace/backend",
+  "private": true,
+  "scripts": {
+    "test": "nox -s tests",
+    "typecheck": "mypy .",
+    "lint": "ruff check ."
+  }
+} 
