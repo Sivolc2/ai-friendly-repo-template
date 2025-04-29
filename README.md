@@ -62,19 +62,24 @@ This repository is structured as a monorepo with a clean separation between pure
 ## 🚀 Quick Start
 
 ```bash
-# Install dependencies
-pnpm install              # Frontend dependencies
+# One-command project setup
+pnpm setup-project       # Install dependencies, create venv, install Python packages, and set up env files
 
-# Set up Python environment
+# Or manual step-by-step setup:
+pnpm install              # Frontend dependencies
 python -m venv .venv      # Create Python virtual environment
 source .venv/bin/activate # Activate Python virtual environment
 pip install -r packages/backend/requirements.txt
-
-# Set up environment variables
-cp .env.defaults packages/frontend/.env
-cp .env.defaults packages/backend/.env
+pnpm setup-env            # Set up environment variables
 
 # Run development servers
+pnpm dev                  # Start both frontend and backend servers (using Turborepo)
+pnpm dev:clean            # Reset ports and start dev servers
+pnpm dev:frontend         # Run only frontend
+pnpm dev:backend          # Run only backend
+
+# Individual commands
+pnpm reset                # Kill processes using ports 8000, 5173, and 5174
 pnpm --filter frontend dev      # Start Vite dev server
 uvicorn packages.backend.main:app --reload  # Start backend server
 
@@ -84,8 +89,7 @@ pnpm typecheck           # Run type checking
 pnpm test                # Run tests for both frontend and backend
 pnpm e2e                 # Run end-to-end tests with Playwright
 pnpm ci                  # Run lint, typecheck, and tests (CI pipeline)
-pnpm ctx:sync            # Update documentation
-pnpm diagrams:generate   # Generate function & pipeline diagrams
+pnpm refresh-docs        # Update documentation and diagrams
 ```
 
 ## 🧪 Testing

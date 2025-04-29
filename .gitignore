@@ -37,6 +37,9 @@ env/
 .dmypy.json
 .pyre/
 
+# nox
+.nox/
+
 # --- React / Node ---
 node_modules/
 dist/
@@ -50,6 +53,9 @@ pnpm-debug.log*
 .vite/
 .cache/
 *.tsbuildinfo
+
+# Turborepo
+.turbo/
 
 # --- IDEs / Editors ---
 .vscode/
