@@ -16,14 +16,14 @@ This project uses a comprehensive testing harness for both frontend and backend 
 
 This project uses separate `.env` files for frontend and backend:
 
-1. For frontend: `packages/frontend/.env`
-2. For backend: `packages/backend/.env`
+1. For frontend: `repo_src/frontend/.env`
+2. For backend: `repo_src/backend/.env`
 
 To set up your environment:
 ```bash
 # Copy the default environment variables
-cp .env.defaults packages/frontend/.env
-cp .env.defaults packages/backend/.env
+cp .env.defaults repo_src/frontend/.env
+cp .env.defaults repo_src/backend/.env
 ```
 
 Make any necessary adjustments to the `.env` files for your local development environment.

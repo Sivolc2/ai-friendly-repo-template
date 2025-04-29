@@ -8,7 +8,7 @@ alwaysApply: true          # always sent with every AI request
 # 🏗️ Project Structure & Documentation
 
 ## Repository Organization
-├── packages
+├── repo_src
 │   ├── backend            # Python backend with functional core
 │   │   ├── adapters/      # DB / HTTP side-effect wrappers
 │   │   ├── data/          # immutable schemas/constants

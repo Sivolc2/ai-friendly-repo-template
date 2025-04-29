@@ -27,7 +27,7 @@ This repository is structured as a monorepo with a clean separation between pure
 
 ```
 .
-├── packages
+├── repo_src
 │   ├── backend            # Python backend with functional core
 │   │   ├── adapters/      # DB / HTTP side-effect wrappers
 │   │   ├── data/          # immutable schemas/constants
@@ -69,7 +69,7 @@ pnpm setup-project       # Install dependencies, create venv, install Python pac
 pnpm install              # Frontend dependencies
 python -m venv .venv      # Create Python virtual environment
 source .venv/bin/activate # Activate Python virtual environment
-pip install -r packages/backend/requirements.txt
+pip install -r repo_src/backend/requirements.txt
 pnpm setup-env            # Set up environment variables
 
 # Run development servers
@@ -81,7 +81,7 @@ pnpm dev:backend          # Run only backend
 # Individual commands
 pnpm reset                # Kill processes using ports 8000, 5173, and 5174
 pnpm --filter frontend dev      # Start Vite dev server
-uvicorn packages.backend.main:app --reload  # Start backend server
+uvicorn repo_src.backend.main:app --reload  # Start backend server
 
 # Development workflow
 pnpm lint                # Run linters
