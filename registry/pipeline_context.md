@@ -24,4 +24,4 @@ from ..adapters.database import save_result
 # ...
 ```
 
-Located at: `packages/backend/pipelines`
+Located at: `repo_src/backend/pipelines`

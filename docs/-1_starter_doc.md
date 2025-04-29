@@ -15,8 +15,8 @@ python -m venv .venv && source .venv/bin/activate
 pip install -U pip pip-tools
 
 # ❷ scaffold directory skeleton
-mkdir -p packages/{backend,shared,scripts} docs/{adr,prd,diagrams,pipelines}
-mv frontend packages/frontend
+mkdir -p repo_src/{backend,shared,scripts} docs/{adr,prd,diagrams,pipelines}
+mv frontend repo_src/frontend
 ```
 
 > **Tip:** keep backend as “bare” Python (no framework) until you plug in FastAPI/Starlette during the first feature.
@@ -27,7 +27,7 @@ mv frontend packages/frontend
 
 ```
 .
-├── packages
+├── repo_src
 │   ├── backend
 │   │   ├── data/         # immutable schemas/constants
 │   │   ├── functions/    # pure functions
@@ -64,14 +64,14 @@ mv frontend packages/frontend
   "private": true,
   "packageManager": "pnpm@9.1.0",
   "workspaces": [
-    "packages/*"
+    "repo_src/*"
   ],
   "scripts": {
     "lint": "pnpm -r lint",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
-    "ctx:sync": "python packages/scripts/export_context.py",
-    "new:feature": "node packages/scripts/scaffold_feature.js",
+    "ctx:sync": "python repo_src/scripts/export_context.py",
+    "new:feature": "node repo_src/scripts/scaffold_feature.js",
     "docs:serve": "mkdocs serve",
     "docs:build": "mkdocs build"
   },
@@ -97,13 +97,13 @@ Below are *outline* bullets; fill in details as your team evolves.
 | File | Purpose |
 |------|---------|
 | **README.md** | Vision, architecture diagram, quick-start, badge links to CI & docs |
-| **packages/backend/README_backend.md** | Runtime diagram, ports/adapters explanation, local dev (`uvicorn main:app --reload`) |
-| **packages/backend/data/README_data.md** | Style guide for frozen dataclasses / Pydantic models |
-| **packages/backend/functions/README_functions.md** | “How to write a pure function” checklist (input types, no prints, docstring pattern) |
-| **packages/backend/pipelines/README_pipelines.md** | Contract for orchestrators, example of composing + error surface |
-| **packages/frontend/README_frontend.md** | Yarn scripts, Storybook, Tailwind theme switcher |
-| **packages/shared/README_shared.md** | Describe code-gen flow: OpenAPI → TS & Pydantic models |
-| **packages/scripts/README_scripts.md** | List every helper script & its CLI |
+| **repo_src/backend/README_backend.md** | Runtime diagram, ports/adapters explanation, local dev (`uvicorn main:app --reload`) |
+| **repo_src/backend/data/README_data.md** | Style guide for frozen dataclasses / Pydantic models |
+| **repo_src/backend/functions/README_functions.md** | “How to write a pure function” checklist (input types, no prints, docstring pattern) |
+| **repo_src/backend/pipelines/README_pipelines.md** | Contract for orchestrators, example of composing + error surface |
+| **repo_src/frontend/README_frontend.md** | Yarn scripts, Storybook, Tailwind theme switcher |
+| **repo_src/shared/README_shared.md** | Describe code-gen flow: OpenAPI → TS & Pydantic models |
+| **repo_src/scripts/README_scripts.md** | List every helper script & its CLI |
 | **docs/README_docs.md** | mkdocs structure, how to publish to GH Pages |
 | **docs/adr/README_adr.md** | Template for Architecture Decision Records |
 | **docs/prd/README_prd.md** | PRD template + acceptance-criteria grammar |
@@ -114,7 +114,7 @@ Put a single-line title at the top of each README that matches the folder name; 
 
 ---
 
-## 5 ️⃣  Context-tracker script (`packages/scripts/export_context.py`)
+## 5 ️⃣  Context-tracker script (`repo_src/scripts/export_context.py`)
 
 ```python
 #!/usr/bin/env python
@@ -126,7 +126,7 @@ Walk backend & frontend dirs and emit:
 import ast, json, hashlib, textwrap, pathlib
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
-PKGS = ["packages/backend", "packages/frontend"]
+PKGS = ["repo_src/backend", "repo_src/frontend"]
 
 funcs = []
 for pkg in PKGS:
@@ -168,9 +168,9 @@ Add to **CI**:
 
 ---
 
-## 6 ️⃣  Scaffold-feature helper (`packages/scripts/scaffold_feature.js`)
+## 6 ️⃣  Scaffold-feature helper (`repo_src/scripts/scaffold_feature.js`)
 
-Pseudo-code—create stub dirs/tests/docs in both packages (left as exercise to flesh out):
+Pseudo-code—create stub dirs/tests/docs in both repo_src (left as exercise to flesh out):
 
 ```js
 #!/usr/bin/env node
@@ -178,12 +178,12 @@ import { mkdirSync, writeFileSync } from "node:fs";
 const [slug] = process.argv.slice(2);
 if (!slug) throw new Error("Usage: pnpm new:feature <slug>");
 const paths = [
-  `packages/backend/functions/${slug}`,
-  `packages/backend/tests/${slug}`,
-  `packages/frontend/src/components/${slug}`
+  `repo_src/backend/functions/${slug}`,
+  `repo_src/backend/tests/${slug}`,
+  `repo_src/frontend/src/components/${slug}`
 ];
 paths.forEach(p => mkdirSync(p, { recursive: true }));
-writeFileSync(`packages/backend/functions/${slug}/README_${slug}.md`,
+writeFileSync(`repo_src/backend/functions/${slug}/README_${slug}.md`,
   `# ${slug}\n\n> Pure functions for …`);
 console.log(`Feature “${slug}” scaffolded`);
 ```
@@ -245,7 +245,7 @@ pip-sync requirements.txt
 
 # 2. run everything
 pnpm --filter frontend dev      # vite
-uvicorn packages.backend.main:app --reload
+uvicorn repo_src.backend.main:app --reload
 pnpm docs:serve                 # live mkdocs
 ```
 

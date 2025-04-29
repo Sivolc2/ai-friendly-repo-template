@@ -14,7 +14,7 @@ Diagrams are generated using the `generate_diagrams.py` script. You can run it w
 pnpm diagrams:generate
 
 # Or directly
-python packages/scripts/generate_diagrams.py
+python repo_src/scripts/generate_diagrams.py
 ```
 
 ## Prerequisites

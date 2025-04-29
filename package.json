@@ -5,9 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "ctx:sync": "python packages/scripts/export_context.py",
+    "ctx:sync": "python repo_src/scripts/export_context.py",
     "registry:update": "pnpm ctx:sync",
-    "diagrams:generate": "python packages/scripts/generate_diagrams.py",
+    "diagrams:generate": "python repo_src/scripts/generate_diagrams.py",
     "refresh-docs": "pnpm registry:update && pnpm diagrams:generate",
     "dev": "turbo run dev",
     "dev:frontend": "turbo run dev --filter=@workspace/frontend",
@@ -17,11 +17,11 @@
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "coverage": "turbo run coverage",
-    "e2e": "concurrently -k \"pnpm --filter frontend run dev\" \"uvicorn packages.backend.main:app --reload\" \"playwright test\"",
-    "reset": "./packages/scripts/reset-ports.sh",
+    "e2e": "concurrently -k \"pnpm --filter frontend run dev\" \"uvicorn repo_src.backend.main:app --reload\" \"playwright test\"",
+    "reset": "./repo_src/scripts/reset-ports.sh",
     "dev:clean": "pnpm reset && pnpm dev",
-    "setup-env": "./packages/scripts/setup-env.sh",
-    "setup-project": "pnpm install && python -m venv .venv && . .venv/bin/activate && pip install -r packages/backend/requirements.txt && pnpm setup-env",
+    "setup-env": "./repo_src/scripts/setup-env.sh",
+    "setup-project": "pnpm install && python -m venv .venv && . .venv/bin/activate && pip install -r repo_src/backend/requirements.txt && pnpm setup-env",
     "ci": "pnpm lint && pnpm typecheck && pnpm test",
     "docs:serve": "mkdocs serve",
     "docs:build": "mkdocs build"
@@ -40,6 +40,6 @@
     "typescript": "^5.8.3"
   },
   "workspaces": [
-    "packages/*"
+    "repo_src/*"
   ]
 }

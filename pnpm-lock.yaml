@@ -30,9 +30,9 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
 
-  packages/backend: {}
+  repo_src/backend: {}
 
-  packages/frontend:
+  repo_src/frontend:
     devDependencies:
       '@testing-library/react':
         specifier: ^15.0.0

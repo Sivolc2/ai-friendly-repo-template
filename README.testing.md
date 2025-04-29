@@ -35,7 +35,7 @@ Make any necessary adjustments to the `.env` files for your local development en
 pnpm test
 ```
 
-### Individual Packages
+### Individual repo_src
 ```bash
 # Frontend tests
 pnpm --filter frontend test
@@ -60,7 +60,7 @@ pnpm i
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install -r packages/backend/requirements.txt
+pip install -r repo_src/backend/requirements.txt
 ```
 
 3. Run all checks:
