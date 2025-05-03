@@ -1,0 +1,46 @@
+# LLM Definitions
+# Add configurations for each LLM you want to use.
+# The 'api_key_env' specifies the environment variable holding the API key.
+llms:
+  gemini-1.5-pro:
+    type: gemini
+    model_name: models/gemini-1.5-pro-latest # Or specific versioned model
+    api_key_env: GOOGLE_API_KEY
+    max_output_tokens: 8192
+    temperature: 0.2
+  gpt-4o:
+    type: openai
+    model_name: gpt-4o
+    api_key_env: OPENAI_API_KEY
+    max_tokens: 4096
+    temperature: 0.2
+  claude-3.5-sonnet:
+    type: anthropic
+    model_name: claude-3-5-sonnet-20240620
+    api_key_env: ANTHROPIC_API_KEY
+    max_tokens: 4096
+    temperature: 0.2
+
+# Workflow Step LLM Configuration
+# Assign a configured LLM to each step.
+workflow_llms:
+  prd_generator: gemini-1.5-pro
+  # Aider agents themselves use the model configured within aider's own settings
+  # (either via command line --model or aider's config)
+  log_summarizer: claude-3.5-sonnet
+
+# Default settings
+defaults:
+  aider_model: gpt-4o # Default model aider agents should use (can be overridden)
+  tmux_session_prefix: aider_run_
+  repo_path: . # Path to the git repository relative to where the script is run
+  # List of files/patterns to always add as context to aider agents
+  # Use aider's glob syntax if needed
+  default_context_files:
+    - README.md
+    # - src/core_module/**.py
+
+# --- Optional ---
+# iTerm2 Integration (macOS only)
+# If true, tries to use osascript for a potentially smoother tmux launch in iTerm
+iterm2_integration: true 
