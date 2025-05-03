@@ -12,10 +12,3 @@ This document outlines the step-by-step process for developing new features in t
 | **6. Sync docs** | `pnpm ctx:sync` | No drift detected |
 | **7. Open PR** | - | CI: lint, type, test, ctx |
 | **8. Merge** | - | Done |
-
-## Design Differences
-
-- This workflow follows the principle of "outside-in" TDD (Test-Driven Development) 
-- Pure functions are implemented first, then composed into pipelines
-- Side effects (database, HTTP, etc.) are isolated in adapter modules
-- Documentation is generated automatically from code and kept in sync via CI 

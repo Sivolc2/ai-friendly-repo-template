@@ -1,0 +1,7 @@
+# Core dependencies
+asyncio>=3.4.3
+aider-chat>=0.18.0
+requests>=2.28.0
+
+# Optional but recommended
+python-dotenv>=1.0.0
