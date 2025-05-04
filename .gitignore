@@ -180,3 +180,6 @@ code_builder/.env        # If using a .env file for API keys
 .aider*cache/
 .aider.chat.history.md
 .aider.input.history
+
+docs/prd/last_response.json
+docs/prd/last_request.json

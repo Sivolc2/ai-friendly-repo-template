@@ -156,18 +156,25 @@ def call_api(prompt, model, api_key):
     print("Failed to get a response from the API.")
     return None
 
-def get_repo_context():
-    """Get a list of files in the repository for context"""
+def execute_git_dump():
+    """Execute the git dump command to export repo contents to repo_contents.txt"""
     try:
-        repo_files = [str(p.relative_to(PROJECT_ROOT)) for p in PROJECT_ROOT.glob('**/*') if p.is_file() and
-                      '.git' not in p.parts and
-                      '.venv' not in p.parts and
-                      'node_modules' not in p.parts and
-                      '__pycache__' not in p.parts and
-                      'dist' not in p.parts and
-                      'build' not in p.parts]
-        
-        return "\nRelevant project files:\n" + "\n".join(sorted(repo_files)[:50])  # Limit to 50 files
+        repo_contents_path = PROJECT_ROOT / 'repo_contents.txt'
+        # Run the git dump command and save the output to repo_contents.txt
+        os.system(f"git dump > {repo_contents_path}")
+        print(f"Repository contents dumped to {repo_contents_path}")
+    except Exception as e:
+        print(f"Error executing git dump: {e}")
+
+def get_repo_context():
+    """Get repository context from repo_contents.txt"""
+    try:
+        # Ensure the repo_contents.txt is up-to-date
+        execute_git_dump()
+        repo_contents_path = PROJECT_ROOT / 'repo_contents.txt'
+        with open(repo_contents_path, 'r') as f:
+            repo_files = f.read()
+        return "\nRelevant project files:\n" + repo_files
     except Exception as e:
         print(f"Warning: Could not get repository file list: {e}")
         return "\nRepository context could not be generated."
