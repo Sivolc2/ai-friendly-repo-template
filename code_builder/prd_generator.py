@@ -4,6 +4,7 @@ Standalone PRD Generator
 
 Usage:
   python standalone_prd.py "Your feature request"
+  python standalone_prd.py "Your feature request" --context context_file1.md context_file2.md
 
 This script assumes your environment is already set up with the required packages 
 and the OpenRouter API key is available in the environment.
@@ -26,6 +27,7 @@ from dotenv import load_dotenv
 SCRIPT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = SCRIPT_DIR.parent
 DOCS_PRD_DIR = PROJECT_ROOT / "docs" / "prd"
+DOCS_CONTEXT_DIR = PROJECT_ROOT / "docs" / "context"
 CONFIG_PATH = SCRIPT_DIR / "config.yaml"
 OPENROUTER_API_ENDPOINT = "https://openrouter.ai/api/v1/chat/completions"
 
@@ -156,30 +158,62 @@ def call_api(prompt, model, api_key):
     print("Failed to get a response from the API.")
     return None
 
-def execute_git_dump():
-    """Execute the git dump command to export repo contents to repo_contents.txt"""
-    try:
-        repo_contents_path = PROJECT_ROOT / 'repo_contents.txt'
-        # Run the git dump command and save the output to repo_contents.txt
-        os.system(f"git dump")
-        print(f"Repository contents dumped to {repo_contents_path}")
-    except Exception as e:
-        print(f"Error executing git dump: {e}")
+def list_context_files():
+    """List all available context files in the docs/context directory"""
+    context_files = list(DOCS_CONTEXT_DIR.glob("*.md"))
+    return context_files
+
+def load_context_files(context_filenames):
+    """Load the content from specified context files"""
+    context_content = []
+    missing_files = []
+    
+    for filename in context_filenames:
+        # Check if it's a relative path or just a filename
+        if '/' in filename:
+            context_file = PROJECT_ROOT / filename
+        else:
+            context_file = DOCS_CONTEXT_DIR / filename
+            
+        if not context_file.exists():
+            missing_files.append(str(context_file))
+            continue
+            
+        try:
+            with open(context_file, 'r') as f:
+                content = f.read()
+                context_content.append(f"--- Context from {context_file.name} ---\n{content}\n")
+                print(f"Loaded context file: {context_file.name}")
+        except Exception as e:
+            print(f"Error loading context file {context_file.name}: {e}")
+    
+    # Exit with error if any specified context files were missing
+    if missing_files:
+        print(f"ERROR: The following context files were not found:")
+        for missing in missing_files:
+            print(f"  - {missing}")
+        print("Please check the file paths and try again.")
+        sys.exit(1)
+        
+    return "\n".join(context_content)
 
 def get_repo_context():
-    """Get repository context from repo_contents.txt"""
+    """Get a list of files in the repository for context"""
     try:
-        # Ensure the repo_contents.txt is up-to-date
-        execute_git_dump()
-        repo_contents_path = PROJECT_ROOT / 'repo_contents.txt'
-        with open(repo_contents_path, 'r') as f:
-            repo_files = f.read()
-        return "\nRelevant project files:\n" + repo_files
+        repo_files = [str(p.relative_to(PROJECT_ROOT)) for p in PROJECT_ROOT.glob('**/*') if p.is_file() and
+                      '.git' not in p.parts and
+                      '.venv' not in p.parts and
+                      'node_modules' not in p.parts and
+                      '__pycache__' not in p.parts and
+                      'dist' not in p.parts and
+                      'build' not in p.parts]
+        
+        return "\nRelevant project files:\n" + "\n".join(sorted(repo_files)[:50])  # Limit to 50 files
     except Exception as e:
         print(f"Warning: Could not get repository file list: {e}")
         return "\nRepository context could not be generated."
 
-def generate_prd(user_query):
+def generate_prd(user_query, context_files=None):
     """Generate a PRD from the user query"""
     # Load configuration and API key
     config = load_config()
@@ -192,6 +226,29 @@ def generate_prd(user_query):
     repo_context = get_repo_context()
     print(f"Generated repository context with {len(repo_context.splitlines())} lines")
     
+    # Get default context files from config
+    default_context_files = config.get('default_context_files', [])
+    if default_context_files is None:
+        default_context_files = []
+    
+    # Combine user-specified and default context files, removing duplicates
+    if context_files is None:
+        context_files = []
+    
+    # Remove any duplicates while preserving order
+    all_context_files = []
+    seen = set()
+    for file in context_files + default_context_files:
+        if file not in seen:
+            all_context_files.append(file)
+            seen.add(file)
+    
+    # Load context files if specified
+    additional_context = ""
+    if all_context_files:
+        additional_context = load_context_files(all_context_files)
+        print(f"Loaded {len(all_context_files)} context files with total {len(additional_context)} characters")
+    
     # Get the prompt template
     prd_prompt = config.get('prd_prompt', """
 Please think through this request then implement the following feature:
@@ -201,8 +258,16 @@ User Query: "{user_query}"
 {repo_context}
 """)
     
+    # Add context files to the template if not already handled in the config
+    if additional_context and "{additional_context}" not in prd_prompt:
+        prd_prompt += "\n\n--- Additional Context ---\n{additional_context}"
+    
     # Format the prompt
-    prompt = prd_prompt.format(user_query=user_query, repo_context=repo_context)
+    prompt = prd_prompt.format(
+        user_query=user_query, 
+        repo_context=repo_context,
+        additional_context=additional_context
+    )
     
     # Call the API
     response = call_api(prompt, model, api_key)
@@ -233,13 +298,35 @@ User Query: "{user_query}"
 
 def main():
     parser = argparse.ArgumentParser(description='Generate a PRD from a feature request')
-    parser.add_argument('query', help='The feature request or query')
+    parser.add_argument('query', help='The feature request or query', nargs='?')
+    parser.add_argument('--context', nargs='+', help='Additional context files to include (from docs/context/ or full path)')
+    parser.add_argument('--list-context', action='store_true', help='List available context files and exit')
+    
     args = parser.parse_args()
+    
+    # List context files and exit if requested
+    if args.list_context:
+        print("\nAvailable context files:")
+        context_files = list_context_files()
+        if context_files:
+            for cf in context_files:
+                print(f"  - {cf.name}")
+        else:
+            print("  No context files found in docs/context/")
+        print("\nUsage example: python prd_generator.py \"Your feature request\" --context README_prd_maker.md")
+        return
+    
+    # Ensure query is provided if not just listing context files
+    if not args.query:
+        parser.error("the following arguments are required: query")
     
     print(f"Generating PRD for query: {args.query}")
     
+    if args.context:
+        print(f"Using context files: {', '.join(args.context)}")
+    
     # Generate the PRD
-    prd_path = generate_prd(args.query)
+    prd_path = generate_prd(args.query, args.context)
     
     if prd_path:
         print("\nPRD generation successful!")
