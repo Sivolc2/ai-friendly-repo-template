@@ -8,9 +8,19 @@
 
 # Model Configuration (using OpenRouter model identifiers)
 # Find identifiers at https://openrouter.ai/models
-prd_generator_model: "google/gemini-flash-1.5" # Model for generating PRD and Aider config
+prd_generator_model: "google/gemini-2.5-flash-preview-04-17" # Model for generating PRD and Aider config
 aider_model: "anthropic/claude-3.5-sonnet"     # Model Aider will use (ensure Aider supports this via OpenRouter)
                                                # Needs to be configured in Aider's own config too (.aider.conf.yml)
+
+# PRD Generation Prompt
+# This prompt template is used for generating PRDs
+# Available placeholders: {user_query}, {repo_context}
+prd_prompt: |
+  Please think through this request then implement the following feature:
+  
+  User Query: "{user_query}"
+  
+  {repo_context}
 
 # Aider Orchestration Settings
 default_num_agents: 1 # Default if LLM doesn't specify
