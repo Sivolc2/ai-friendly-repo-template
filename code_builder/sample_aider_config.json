@@ -1,0 +1,12 @@
+{
+  "prd_slug": "hello-world-test",
+  "num_agents": 1,
+  "agents": [
+    {
+      "agent_id": 1,
+      "description": "Simple hello world test agent",
+      "files_context": ["README.md"],
+      "prompt": "Say hello world and help me understand the project structure."
+    }
+  ]
+} 

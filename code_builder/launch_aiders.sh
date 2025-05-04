@@ -48,14 +48,15 @@ echo "Config File: ${CONFIG_JSON_PATH}"
 echo "Using aider command: ${AIDER_CMD}"
 
 # --- Tmux Setup ---
-# Kill existing session if it exists
-if tmux has-session -t "$TMUX_SESSION_NAME" 2>/dev/null; then
-  echo "Session $TMUX_SESSION_NAME already exists. Killing old session..."
-  tmux kill-session -t "$TMUX_SESSION_NAME"
-  sleep 1
-fi
+# Kill existing session if it exists (optional, uncomment if desired)
+# tmux kill-session -t "$TMUX_SESSION_NAME" 2>/dev/null || true
 
-echo "Creating new tmux session: ${TMUX_SESSION_NAME}"
+# Check if session exists, attach if so, otherwise create
+if tmux has-session -t "$TMUX_SESSION_NAME" 2>/dev/null; then
+  echo "Session $TMUX_SESSION_NAME already exists. Attaching..."
+  tmux attach-session -t "$TMUX_SESSION_NAME"
+  exit 0
+fi
 
 # --- Agent Launch ---
 num_agents=$(jq '.num_agents' "$CONFIG_JSON_PATH")
@@ -67,12 +68,10 @@ if [[ "$num_agents" -lt 1 ]]; then
     exit 1
 fi
 
-# Create a new session in detached mode
-tmux new-session -d -s "$TMUX_SESSION_NAME" -n "Agents"
-sleep 1  # Give tmux a moment to initialize
+# --- Create Windows and Send Commands ---
+agent_index=0
+first_window_created=false
 
-# Use a much simpler approach - running separate commands directly
-agent_count=1
 jq -c '.agents[]' "$CONFIG_JSON_PATH" | while IFS= read -r agent_config; do
     agent_id=$(echo "$agent_config" | jq -r '.agent_id')
     agent_desc=$(echo "$agent_config" | jq -r '.description')
@@ -83,31 +82,47 @@ jq -c '.agents[]' "$CONFIG_JSON_PATH" | while IFS= read -r agent_config; do
     echo "Preparing Agent ${agent_id}: ${agent_desc}"
 
     # Construct the aider command
+    # Ensure prompt quotes are handled if they exist within the JSON string
     aider_cmd="${AIDER_CMD} ${files_context} --message \"${agent_prompt}\""
 
-    # Create a new window for each agent
-    if [[ "$agent_count" -eq 1 ]]; then
-        # Rename the initial window
-        tmux rename-window -t "${TMUX_SESSION_NAME}:0" "Agent-${agent_id}"
+    window_name="Agent-${agent_id}"
+    target_window_index=$agent_index # Tmux window indices are 0-based
+
+    if [[ "$first_window_created" == false ]]; then
+        # Create the session with the first window (detached)
+        echo "Creating session ${TMUX_SESSION_NAME} with first window ${window_name}"
+        tmux new-session -d -s "$TMUX_SESSION_NAME" -n "$window_name"
+        sleep 1.5 # Small delay after initial session creation
+        first_window_created=true
+        target_window_specifier="${TMUX_SESSION_NAME}:${target_window_index}"
     else
-        tmux new-window -t "${TMUX_SESSION_NAME}" -n "Agent-${agent_id}"
+        # Create subsequent windows
+        echo "Creating new window ${window_name} in session ${TMUX_SESSION_NAME}"
+        # Create new window and get its index, though we can rely on agent_index here
+        tmux new-window -t "${TMUX_SESSION_NAME}" -n "$window_name"
+        sleep 1.5 # Small delay after creating window
+        target_window_specifier="${TMUX_SESSION_NAME}:${target_window_index}"
     fi
-    
-    # Send the command to the newly created window
-    sleep 0.5
-    tmux send-keys -t "${TMUX_SESSION_NAME}:$(($agent_count-1))" "clear" C-m
-    sleep 0.5
-    tmux send-keys -t "${TMUX_SESSION_NAME}:$(($agent_count-1))" "$aider_cmd" C-m
-    
-    ((agent_count++))
+
+    # Send the command to the target window
+    echo "Sending command to ${target_window_specifier}"
+    # Use C-m for Enter. Clear screen first for tidiness.
+    tmux send-keys -t "$target_window_specifier" "clear" C-m
+    sleep 0.2 # Tiny delay between commands
+    # Send the aider command. Wrap in quotes just in case.
+    tmux send-keys -t "$target_window_specifier" "${aider_cmd}" C-m
+
+    ((agent_index++))
 done
 
-# Select the first window before attaching
-sleep 1
+# --- Final Steps ---
+# Select the first window (index 0) before attaching
+sleep 1.5 # Wait a bit for commands to start
+echo "Selecting first window..."
 tmux select-window -t "${TMUX_SESSION_NAME}:0"
 
 # Attach to the session
 echo "Attaching to tmux session ${TMUX_SESSION_NAME}..."
 echo "Use 'Ctrl+b d' to detach from the session."
-echo "Use 'Ctrl+b n' to switch to next window, 'Ctrl+b p' for previous window."
+echo "Use 'Ctrl+b n' to switch to the next window, 'Ctrl+b p' for the previous window."
 tmux attach-session -t "$TMUX_SESSION_NAME" 
