@@ -1,0 +1,17 @@
+# Aider Configuration
+# Copy this file to .aider.conf.yml and fill in your values
+
+# Model configuration for OpenRouter
+model: openrouter/anthropic/claude-3.5-sonnet
+
+# OpenRouter API Key
+# Set your API key here or via OPENROUTER_API_KEY environment variable
+# Example: openrouter-api-key: sk-or-v1-your-api-key
+# openrouter-api-key: 
+
+# Git configuration 
+git: true          # Use git for tracking changes
+auto-commits: false # Don't automatically commit changes
+
+# Editor settings
+edit-format: diff # Use diff format for showing changes 

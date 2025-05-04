@@ -1,0 +1,10 @@
+PyYAML
+requests
+python-dotenv # To load API keys from a potential .env file
+aider-install  # Installs aider in its own Python environment
+openai        # Compatible version for aider
+pathlib       # Path manipulation
+argparse      # CLI argument parsing
+colorama      # Terminal colors
+prompt-toolkit # Interactive prompts
+pyperclip     # Clipboard operations 

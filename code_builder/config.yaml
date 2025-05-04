@@ -1,0 +1,22 @@
+# API Keys - Prefer environment variables for security, but can be placed here.
+# Example: export OPENROUTER_API_KEY='your_key_here'
+openrouter_api_key: null # Set to your key or leave null to use environment variable OPENROUTER_API_KEY
+
+# Model Configuration (using OpenRouter model identifiers)
+# Find identifiers at https://openrouter.ai/models
+prd_generator_model: "google/gemini-flash-1.5" # Model for generating PRD and Aider config
+aider_model: "anthropic/claude-3.5-sonnet"     # Model Aider will use (ensure Aider supports this via OpenRouter)
+                                               # Needs to be configured in Aider's own config too (.aider.conf.yml)
+
+# Aider Orchestration Settings
+default_num_agents: 1 # Default if LLM doesn't specify
+
+# --- Aider Configuration (Informational - Configure Aider via ~/.aider.conf.yml or ./.aider.conf.yml) ---
+# It's recommended to configure Aider's model and API key via its own config file
+# Example .aider.conf.yml content:
+# ---
+# model: openrouter/anthropic/claude-3.5-sonnet
+# openrouter-api-key: sk-or-v1-abc...xyz # Or set OPENROUTER_API_KEY env var
+# auto-commits: false
+# git: true
+# --- 

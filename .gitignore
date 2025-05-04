@@ -170,3 +170,13 @@ __pycache__/
 **/logs/
 **/*.log
 .aider*
+
+# Code builder artifacts (if config contains secrets or runs are large/temporary)
+code_builder/runs/
+code_builder/config.yaml # If API keys are stored directly (NOT RECOMMENDED)
+code_builder/.env        # If using a .env file for API keys
+
+# Aider cache/history (often large)
+.aider*cache/
+.aider.chat.history.md
+.aider.input.history
