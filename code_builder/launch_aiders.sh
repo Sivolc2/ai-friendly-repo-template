@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# launch_aiders.sh - Robust tmux management for multiple aider agents
 set -euo pipefail # Exit on error, unset variable, or pipe failure
 
 # --- Configuration & Arguments ---
@@ -21,21 +22,13 @@ if [[ -z "$RUN_ID" ]]; then
   exit 1
 fi
 
-# Check for required tools
-if ! command -v tmux &> /dev/null; then
-    echo "Error: tmux is not installed. Please install tmux (e.g., 'brew install tmux' or 'sudo apt-get install tmux')."
+# --- Check Dependencies ---
+for cmd in tmux jq "$AIDER_CMD"; do
+  if ! command -v "$cmd" &> /dev/null; then
+    echo "Error: '$cmd' command not found. Please install it first."
     exit 1
-fi
-if ! command -v jq &> /dev/null; then
-    echo "Error: jq is not installed. Please install jq (e.g., 'brew install jq' or 'sudo apt-get install jq')."
-    exit 1
-fi
-
-# Check if aider is available
-if ! command -v "$AIDER_CMD" &> /dev/null; then
-    echo "Warning: '$AIDER_CMD' command not found directly. Make sure aider-install ran correctly."
-    echo "The AIDER_CMD variable is set to: $AIDER_CMD"
-fi
+  fi
+done
 
 # Check if we are inside the project root (optional but good practice)
 if [ ! -f "./code_builder/config.yaml" ]; then
@@ -47,82 +40,80 @@ echo "--- Launching Aider Agents in Tmux Session: ${TMUX_SESSION_NAME} ---"
 echo "Config File: ${CONFIG_JSON_PATH}"
 echo "Using aider command: ${AIDER_CMD}"
 
-# --- Tmux Setup ---
-# Kill existing session if it exists (optional, uncomment if desired)
-# tmux kill-session -t "$TMUX_SESSION_NAME" 2>/dev/null || true
-
-# Check if session exists, attach if so, otherwise create
+# --- Clean any existing session ---
 if tmux has-session -t "$TMUX_SESSION_NAME" 2>/dev/null; then
-  echo "Session $TMUX_SESSION_NAME already exists. Attaching..."
-  tmux attach-session -t "$TMUX_SESSION_NAME"
-  exit 0
+  echo "Warning: Session $TMUX_SESSION_NAME already exists. Killing existing session..."
+  tmux kill-session -t "$TMUX_SESSION_NAME"
 fi
 
-# --- Agent Launch ---
+# --- Get agents from config ---
 num_agents=$(jq '.num_agents' "$CONFIG_JSON_PATH")
-echo "Number of agents to launch: $num_agents"
-
-# Handle case of zero agents
 if [[ "$num_agents" -lt 1 ]]; then
     echo "Error: 'num_agents' is less than 1 in config file. Exiting."
     exit 1
 fi
 
-# --- Create Windows and Send Commands ---
-agent_index=0
-first_window_created=false
+echo "Found $num_agents agent(s) in config file."
 
+# --- Create session without attaching ---
+tmux new-session -d -s "$TMUX_SESSION_NAME" -n "Initial" "echo 'Initializing session...'; sleep 5"
+echo "Created new tmux session: $TMUX_SESSION_NAME"
+sleep 2 # Give tmux time to fully create the session
+
+# --- Process each agent ---
+agent_index=0
 jq -c '.agents[]' "$CONFIG_JSON_PATH" | while IFS= read -r agent_config; do
+    # Extract agent info
     agent_id=$(echo "$agent_config" | jq -r '.agent_id')
     agent_desc=$(echo "$agent_config" | jq -r '.description')
     agent_prompt=$(echo "$agent_config" | jq -r '.prompt')
-    # Join files with spaces for the aider command line
     files_context=$(echo "$agent_config" | jq -r '.files_context | join(" ")')
-
-    echo "Preparing Agent ${agent_id}: ${agent_desc}"
-
-    # Construct the aider command
-    # Ensure prompt quotes are handled if they exist within the JSON string
-    aider_cmd="${AIDER_CMD} ${files_context} --message \"${agent_prompt}\""
-
+    
     window_name="Agent-${agent_id}"
-    target_window_index=$agent_index # Tmux window indices are 0-based
-
-    if [[ "$first_window_created" == false ]]; then
-        # Create the session with the first window (detached)
-        echo "Creating session ${TMUX_SESSION_NAME} with first window ${window_name}"
-        tmux new-session -d -s "$TMUX_SESSION_NAME" -n "$window_name"
-        sleep 1.5 # Small delay after initial session creation
-        first_window_created=true
-        target_window_specifier="${TMUX_SESSION_NAME}:${target_window_index}"
+    echo "Creating window for Agent ${agent_id}: ${agent_desc}"
+    
+    # Create a new window
+    if [[ "$agent_index" -eq 0 ]]; then
+        # Rename first window instead of creating a new one
+        tmux rename-window -t "${TMUX_SESSION_NAME}:0" "$window_name"
     else
-        # Create subsequent windows
-        echo "Creating new window ${window_name} in session ${TMUX_SESSION_NAME}"
-        # Create new window and get its index, though we can rely on agent_index here
-        tmux new-window -t "${TMUX_SESSION_NAME}" -n "$window_name"
-        sleep 1.5 # Small delay after creating window
-        target_window_specifier="${TMUX_SESSION_NAME}:${target_window_index}"
+        # Create new windows for additional agents
+        tmux new-window -t "$TMUX_SESSION_NAME" -n "$window_name"
     fi
-
-    # Send the command to the target window
-    echo "Sending command to ${target_window_specifier}"
-    # Use C-m for Enter. Clear screen first for tidiness.
-    tmux send-keys -t "$target_window_specifier" "clear" C-m
-    sleep 0.2 # Tiny delay between commands
-    # Send the aider command. Wrap in quotes just in case.
-    tmux send-keys -t "$target_window_specifier" "${aider_cmd}" C-m
-
+    
+    # Construct aider command
+    aider_cmd="${AIDER_CMD} ${files_context} --message \"${agent_prompt}\""
+    
+    # Debug output
+    echo "Window: $window_name, Command: $aider_cmd"
+    
+    # Send the command
+    window_target="${TMUX_SESSION_NAME}:${agent_index}"
+    echo "Sending command to window: $window_target"
+    
+    # Clear the terminal
+    tmux send-keys -t "$window_target" "clear" C-m
+    sleep 1
+    
+    # Source .env file if it exists
+    tmux send-keys -t "$window_target" "if [ -f \"./code_builder/.env\" ]; then source ./code_builder/.env; echo \"Loaded environment from ./code_builder/.env\"; fi" C-m
+    sleep 1
+    
+    # Run the aider command
+    tmux send-keys -t "$window_target" "${aider_cmd}" C-m
+    
     ((agent_index++))
+    # Add some delay between creating windows
+    sleep 2
 done
 
-# --- Final Steps ---
-# Select the first window (index 0) before attaching
-sleep 1.5 # Wait a bit for commands to start
-echo "Selecting first window..."
+# Select first window
 tmux select-window -t "${TMUX_SESSION_NAME}:0"
+sleep 1
 
-# Attach to the session
-echo "Attaching to tmux session ${TMUX_SESSION_NAME}..."
+echo "Setup complete. Attaching to tmux session: $TMUX_SESSION_NAME"
 echo "Use 'Ctrl+b d' to detach from the session."
 echo "Use 'Ctrl+b n' to switch to the next window, 'Ctrl+b p' for the previous window."
+
+# Attach to the session
 tmux attach-session -t "$TMUX_SESSION_NAME" 

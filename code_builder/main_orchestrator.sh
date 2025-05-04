@@ -164,7 +164,7 @@ echo "Python script finished. Aider config generated at: $JSON_CONFIG_PATH"
 echo "Launching Aider agents via tmux..."
 # Export AIDER_CMD so launch_aiders.sh can use it
 export AIDER_CMD
-bash "$SCRIPT_DIR/launch_aiders_fixed.sh" "$JSON_CONFIG_PATH" "$RUN_ID"
+bash "$LAUNCH_SCRIPT_PATH" "$JSON_CONFIG_PATH" "$RUN_ID"
 
 # --- Completion ---
 echo "Orchestration script finished. Aider agents are running in tmux session: aider_run_${RUN_ID}"
