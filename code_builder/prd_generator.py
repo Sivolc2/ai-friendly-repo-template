@@ -161,7 +161,7 @@ def execute_git_dump():
     try:
         repo_contents_path = PROJECT_ROOT / 'repo_contents.txt'
         # Run the git dump command and save the output to repo_contents.txt
-        os.system(f"git dump > {repo_contents_path}")
+        os.system(f"git dump")
         print(f"Repository contents dumped to {repo_contents_path}")
     except Exception as e:
         print(f"Error executing git dump: {e}")
