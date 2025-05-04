@@ -1,6 +1,7 @@
 # --- Global ---
 .DS_Store
 .env
+.env.*
 
 # --- Python ---
 __pycache__/

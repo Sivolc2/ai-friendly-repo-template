@@ -11,12 +11,14 @@ This directory contains tools to help you use AI agents for code generation and 
    - OpenRouter API Key (https://openrouter.ai/keys)
 
 2. **Configuration**:
-   - Copy `.aider.conf.yml.example` to `.aider.conf.yml` in the project root
-   - Create a `.env` file in the `code_builder/` directory with your API keys (see `docs/env_example.md`)
-   - Set your OpenRouter API key either:
-     - In the `.env` file (recommended): `OPENROUTER_API_KEY=your-key-here`
-     - In the `.aider.conf.yml` file
-     - Via an environment variable: `export OPENROUTER_API_KEY=your-key-here`
+   - Copy the env.template file to create your .env file:
+     ```bash
+     cp code_builder/env.template code_builder/.env
+     ```
+   - Edit the .env file to add your OpenRouter API key
+   - Optionally, copy `.aider.conf.yml.example` to `.aider.conf.yml` in the project root to configure Aider
+   
+   All API keys are stored in the .env file, not in config.yaml.
 
 3. **Python Environment**:
    The scripts automatically set up a Python virtual environment at `.venv/` in the project root and use aider-install to install aider in its own separate environment.

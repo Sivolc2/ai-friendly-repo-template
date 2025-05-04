@@ -21,16 +21,20 @@ OPENROUTER_API_ENDPOINT = "https://openrouter.ai/api/v1/chat/completions"
 # --- Helper Functions ---
 
 def load_config():
-    """Loads configuration from config.yaml"""
+    """Loads configuration from config.yaml and environment variables"""
     try:
         with open(CONFIG_PATH, 'r') as f:
             config = yaml.safe_load(f)
-            # Load API key from environment if not in config
+            
+            # Load API key from environment, with priority to .env file
+            load_dotenv(dotenv_path=SCRIPT_DIR / '.env') # Load .env file if it exists
+            
+            # Get API key from environment variable
+            config['openrouter_api_key'] = os.environ.get('OPENROUTER_API_KEY')
+            
             if not config.get('openrouter_api_key'):
-                load_dotenv(dotenv_path=SCRIPT_DIR / '.env') # Optional: load .env file
-                config['openrouter_api_key'] = os.environ.get('OPENROUTER_API_KEY')
-            if not config.get('openrouter_api_key'):
-                raise ValueError("OpenRouter API key not found in config.yaml or OPENROUTER_API_KEY environment variable.")
+                raise ValueError("OpenRouter API key not found in environment. Please set OPENROUTER_API_KEY in your environment or in code_builder/.env file.")
+            
             return config
     except FileNotFoundError:
         print(f"Error: Configuration file not found at {CONFIG_PATH}")

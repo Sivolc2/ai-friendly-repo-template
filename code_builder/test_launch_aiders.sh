@@ -11,6 +11,9 @@ RUN_ID="test_$(date +%s)"
 TMUX_SESSION_NAME="aider_test_${RUN_ID}"
 AIDER_CMD="aider" # replace with actual path if needed
 
+# --- Enable more verbose debugging ---
+set -x  # Show commands as they are executed
+
 echo "=== TMUX DEBUGGING TEST ==="
 echo "Script directory: ${SCRIPT_DIR}"
 echo "Config file: ${CONFIG_JSON_PATH}"
@@ -110,10 +113,14 @@ for target_format in \
     "$TMUX_SESSION_NAME"
 do
     echo "  Testing target: $target_format"
+    echo "  Running command: tmux select-window -t \"$target_format\""
     if tmux select-window -t "$target_format" 2>/dev/null; then
         echo "    SUCCESS: Can target '$target_format'"
     else
         echo "    FAILED: Cannot target '$target_format'"
+        # Try to get more info about why it failed
+        echo "    Available windows:"
+        tmux list-windows -t "$TMUX_SESSION_NAME" || echo "    Cannot list windows"
     fi
 done
 
@@ -135,34 +142,52 @@ done
 
 # --- Step 6: Try actual aider commands ---
 echo "Step 6: Testing actual aider command..."
-TARGET_WINDOW="$TMUX_SESSION_NAME:0"
-AIDER_TEST_CMD="$AIDER_CMD README.md --message \"This is a test\""
+# Use window name only, not numeric index
+TARGET_WINDOW="$TMUX_SESSION_NAME:$NEW_WINDOW_NAME"
+ENV_FILE="code_builder/.env"
+
+# Check if env file exists and construct command with env vars
+if [[ -f "$ENV_FILE" ]]; then
+    AIDER_TEST_CMD="export \$(grep -v '^#' \"${ENV_FILE}\" | xargs) && ${AIDER_CMD} README.md --message \"This is a test\""
+    echo "  Using environment from: $ENV_FILE"
+else
+    AIDER_TEST_CMD="$AIDER_CMD README.md --message \"This is a test\""
+    echo "  No environment file found at: $ENV_FILE"
+fi
 
 echo "  Command to send: $AIDER_TEST_CMD"
 echo "  Target window: $TARGET_WINDOW"
 
-echo "  Sleeping for 2 seconds before sending command..."
-sleep 2
+echo "  Available windows:"
+tmux list-windows -t "$TMUX_SESSION_NAME" || echo "  Cannot list windows"
 
-if tmux send-keys -t "$TARGET_WINDOW" "clear" C-m; then
-    echo "    SUCCESS: Sent 'clear' command"
+echo "  Sleeping for 5 seconds before sending command..."
+sleep 5
+
+# Try sending to the window with name
+if ! tmux send-keys -t "$TARGET_WINDOW" "clear" C-m 2>/dev/null; then
+    echo "    CRITICAL: Could not send 'clear' command to $TARGET_WINDOW"
+    exit 1
 else
-    echo "    FAILED: Could not send 'clear' command"
+    echo "    SUCCESS: Sent 'clear' command to $TARGET_WINDOW"
 fi
 
-sleep 1
+# Wait longer before sending aider command
+sleep 3
 echo "  Sending aider command..."
 if tmux send-keys -t "$TARGET_WINDOW" "$AIDER_TEST_CMD" C-m; then
     echo "    SUCCESS: Sent aider command"
 else
     echo "    FAILED: Could not send aider command"
+    exit 1
 fi
 
-# --- Step 7: Attach to the session ---
+# Wait much longer before attaching to give aider time to initialize
 echo ""
 echo "=== TEST COMPLETED ==="
-echo "Attaching to test session. Use Ctrl+b d to detach."
-echo "You should see the aider command running."
+echo "Waiting 10 seconds for aider to initialize..."
+echo "You should see the aider command running after attaching."
+echo "Use Ctrl+b d to detach from the session."
 echo ""
-sleep 2
+sleep 10
 tmux attach-session -t "$TMUX_SESSION_NAME" 

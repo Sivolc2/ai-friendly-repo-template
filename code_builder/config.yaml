@@ -1,6 +1,10 @@
-# API Keys - Prefer environment variables for security, but can be placed here.
-# Example: export OPENROUTER_API_KEY='your_key_here'
-openrouter_api_key: null # Set to your key or leave null to use environment variable OPENROUTER_API_KEY
+# Configuration for Code Builder
+
+# API Keys - All API keys should be stored in code_builder/.env file, not here
+# Example .env content:
+# OPENROUTER_API_KEY='your_key_here'
+# ANTHROPIC_API_KEY='your_key_here'
+# OPENAI_API_KEY='your_key_here'
 
 # Model Configuration (using OpenRouter model identifiers)
 # Find identifiers at https://openrouter.ai/models
@@ -16,7 +20,6 @@ default_num_agents: 1 # Default if LLM doesn't specify
 # Example .aider.conf.yml content:
 # ---
 # model: openrouter/anthropic/claude-3.5-sonnet
-# openrouter-api-key: sk-or-v1-abc...xyz # Or set OPENROUTER_API_KEY env var
 # auto-commits: false
 # git: true
 # --- 

@@ -167,7 +167,7 @@ export AIDER_CMD
 bash "$LAUNCH_SCRIPT_PATH" "$JSON_CONFIG_PATH" "$RUN_ID"
 
 # --- Completion ---
-echo "Orchestration script finished. Aider agents are running in tmux session: aider_run_${RUN_ID}"
-echo "Attach to session: tmux attach-session -t aider_run_${RUN_ID}"
+echo "Orchestration script finished. Aider agents are running in tmux session: aider_session"
+echo "Attach to session: tmux attach-session -t aider_session"
 # Deactivate venv (optional, depends on workflow)
 # deactivate 
