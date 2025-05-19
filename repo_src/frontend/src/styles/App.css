@@ -1,0 +1,101 @@
+.container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.card {
+  background-color: #1a1a1a;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 8px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background-color: #242424;
+  color: white;
+}
+
+.form-group textarea {
+  min-height: 80px;
+}
+
+.button-primary {
+  background-color: #646cff;
+  color: white;
+}
+
+.error {
+  color: #ff6464;
+}
+
+.item-list {
+  list-style: none;
+  padding: 0;
+}
+
+.item {
+  background-color: #2c2c2c;
+  border-radius: 4px;
+  padding: 15px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.item-content {
+  flex: 1;
+  text-align: left;
+}
+
+.item-name {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.item-description {
+  color: #aaa;
+  font-size: 0.9em;
+}
+
+.item-delete {
+  background-color: #ff6464;
+  color: white;
+  margin-left: 10px;
+}
+
+@media (prefers-color-scheme: light) {
+  .card {
+    background-color: #f9f9f9;
+  }
+  
+  .form-group input,
+  .form-group textarea {
+    background-color: white;
+    color: #213547;
+  }
+  
+  .item {
+    background-color: #eaeaea;
+  }
+  
+  .item-description {
+    color: #666;
+  }
+} 

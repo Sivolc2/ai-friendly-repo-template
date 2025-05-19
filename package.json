@@ -17,7 +17,7 @@
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
     "coverage": "turbo run coverage",
-    "e2e": "concurrently -k \"pnpm --filter frontend run dev\" \"uvicorn repo_src.backend.main:app --reload\" \"playwright test\"",
+    "e2e": "concurrently -k \"pnpm --filter frontend run dev\" \"cd repo_src/backend && source venv/bin/activate && uvicorn repo_src.backend.main:app --reload --app-dir ../..\" \"playwright test\"",
     "reset": "./repo_src/scripts/reset-ports.sh",
     "dev:clean": "pnpm reset && pnpm dev",
     "setup-env": "./repo_src/scripts/setup-env.sh",
