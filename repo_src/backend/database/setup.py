@@ -1,6 +1,6 @@
-from .connection import engine, Base
+from repo_src.backend.database.connection import engine, Base
 # Import all models here so Base has them registered
-from . import models # noqa Ensures models.py is loaded and Item model is registered with Base
+from repo_src.backend.database import models # noqa Ensures models.py is loaded and Item model is registered with Base
 
 def init_db():
     """
