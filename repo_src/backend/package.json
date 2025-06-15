@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "source venv/bin/activate && uvicorn repo_src.backend.main:app --reload --port 8000 --app-dir ../..",
-    "start": "source venv/bin/activate && uvicorn repo_src.backend.main:app --port 8000 --app-dir ../..",
+    "dev": "source ../../.venv/bin/activate && uvicorn repo_src.backend.main:app --reload --port 8000 --app-dir ../..",
+    "start": "source ../../.venv/bin/activate && uvicorn repo_src.backend.main:app --port 8000 --app-dir ../..",
     "setup-env": "../../scripts/setup-env.sh"
   }
 } 
