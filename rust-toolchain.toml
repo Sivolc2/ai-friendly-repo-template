@@ -1,0 +1,6 @@
+[toolchain]
+channel = "stable" # Using stable channel for better compatibility
+# Or specify a specific version:
+# channel = "1.7X.0"
+# components = [ "rustfmt", "clippy" ]
+# target = [ "wasm32-unknown-unknown" ] # Ensure this target is available 

@@ -1,0 +1,19 @@
+[workspace]
+resolver = "2"
+members = [
+    "repo_src/app",
+    "repo_src/shared",
+]
+
+# Default profile for development (can be overridden in user's ~/.cargo/config.toml)
+[profile.dev]
+opt-level = 1 # A bit of optimization for dev builds
+debug = true
+
+# Profile for release builds
+[profile.release]
+opt-level = 'z' # Optimize for size. 's' is also a good option.
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = "symbols" # "debuginfo" or true also works 

@@ -1,0 +1,18 @@
+[package]
+name = "shared"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+chrono = { version = "0.4", features = ["serde"] } # For timestamps if needed directly in shared DTOs
+
+# Required by Leptos if these types are passed to server functions or used in signals directly
+# and need to be (de)serialized across wasm/server boundary by Leptos itself.
+# For simple data DTOs, serde is usually enough.
+leptos = { version = "0.6", default-features = false, optional = true } # Keep optional if not always needed by all shared types
+
+[features]
+# This feature can be used by the app crate to enable leptos-specific derives if needed
+# for some shared types.
+with_leptos = ["dep:leptos"] 
