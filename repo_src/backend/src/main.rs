@@ -27,18 +27,46 @@ async fn main() {
     local.run_until(async move {
         // Run migrations if the DATABASE_AUTO_MIGRATE feature is enabled for the backend crate.
         // This feature, in turn, enables frontend/DATABASE_AUTO_MIGRATE.
-        #[cfg(feature = "DATABASE_AUTO_MIGRATE")]
+        #[cfg(feature = "DATABASE_AUTO_MIGRATE")] // This block handles migrations and seeding
         {
-            logging::log!("DATABASE_AUTO_MIGRATE feature is enabled for backend.");
+            logging::log!("DATABASE_AUTO_MIGRATE feature is enabled for backend. Attempting to run migrations...");
+            // Ensure the target directory exists for SQLite file creation if using a file-based DB.
+            if let Ok(db_url) = std::env::var("DATABASE_URL") {
+                if db_url.starts_with("sqlite:") {
+                    let path_str = db_url.trim_start_matches("sqlite:");
+                    if let Some(parent_dir) = std::path::Path::new(path_str.split('?').next().unwrap_or("")).parent() {
+                        if !parent_dir.exists() {
+                            logging::log!("Attempting to create database directory: {:?}", parent_dir);
+                            if let Err(e) = std::fs::create_dir_all(parent_dir) {
+                                logging::error!("Failed to create database directory {:?}: {:?}", parent_dir, e);
+                                // std::process::exit(1); // Exit if directory creation fails, as migrations will likely fail.
+                            }
+                        }
+                    }
+                }
+            }
+
             // The database module and run_migrations function are part of the `frontend` crate,
             // compiled under its "ssr" and "DATABASE_AUTO_MIGRATE" features.
             match frontend::database::run_migrations().await {
                 Ok(_) => logging::log!("Database migrations completed successfully."),
                 Err(e) => {
-                    logging::error!("Failed to run database migrations: {:?}", e);
-                    // Depending on your error handling strategy, you might want to exit here.
-                    // std::process::exit(1);
+                    logging::error!("FATAL: Failed to run database migrations: {:?}", e);
+                    // Exit if migrations fail, as the app is likely unusable.
+                    std::process::exit(1);
                 }
+            }
+
+            // Conditionally seed the database in development environments
+            let leptos_env = std::env::var("LEPTOS_ENV").unwrap_or_else(|_| "PROD".to_string());
+            if leptos_env == "DEV" {
+                logging::log!("Development environment detected (LEPTOS_ENV=DEV). Attempting to seed database...");
+                if let Err(e) = frontend::database::seed_database().await {
+                    logging::error!("Failed to seed database: {:?}", e);
+                    // Decide if this is a fatal error. For seeding, perhaps not.
+                }
+            } else {
+                logging::log!("Production-like environment (LEPTOS_ENV is not DEV). Skipping database seeding.");
             }
         }
 

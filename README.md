@@ -65,29 +65,39 @@ It's designed to be AI-friendly, encouraging clear structure, good documentation
 
 1.  **Clone the repository:**
     ```bash
-    git clone <repository-url>
-    cd <repository-name>
+    git clone <repository-url> 
+    cd <repository-name> # Stay in the workspace root
     ```
 
 2.  **Set up environment variables:**
-    Copy `example_env_file.sh` contents to `.env` (remove the `export` commands):
+    Ensure you are in the workspace root. Copy `example_env_file.sh` contents to a new file named `.env` in the workspace root.
+    Remove the `export ` prefixes from each line in the `.env` file.
     ```bash
-    cp example_env_file.sh .env
-    sed -i '' 's/export //g' .env  # On macOS
-    # or sed -i 's/export //g' .env  # On Linux
+    # Example:
+    # cp example_env_file.sh .env
+    # Then edit .env to remove 'export ' from lines, or use:
+    # sed -i'.bak' 's/export //g' .env  # On macOS (creates .env.bak)
+    # sed -i 's/export //g' .env       # On Linux
+    ```
+    Your `.env` file (in the workspace root) should look like:
+    ```
+    DATABASE_URL="sqlite:./target/dev.db?mode=rwc"
+    RUST_BACKTRACE=0
+    # LEPTOS_... variables if needed
     ```
 
-3.  **Build the application:**
+3.  **Build the application (from workspace root):**
     ```bash
     cargo leptos build
     ```
 
-4.  **Run the development server:**
+4.  **Run the development server (from workspace root):**
     ```bash
     cargo leptos watch
     ```
     This command will build the application, start a development server, and watch for file changes to enable hot reloading.
     Open your browser to `http://127.0.0.1:3000` (or the address shown in the terminal).
+    The `DATABASE_URL` path `./target/dev.db` will be relative to the workspace root.
 
 ## Development Workflow
 
@@ -105,17 +115,20 @@ It's designed to be AI-friendly, encouraging clear structure, good documentation
 Refer to `docs/guides/init.md` for the complete template creation guide and feature development workflow.
 
 ## Building for Production
-
+(From the workspace root)
 ```bash
 cargo leptos build --release
 ```
-This will create an optimized build in the `target/release` directory for the server binary and `target/site` for the frontend assets (WASM, JS glue, CSS).
+This will create an optimized build:
+- Server binary: `target/release/backend` (or `backend.exe` on Windows).
+- Frontend assets: `target/site/` (WASM, JS glue, CSS).
 
 ## Running in Production
 
 After building, you can run the server binary:
+(From the workspace root)
 ```bash
-./target/release/backend  # Server binary name matches backend crate
+./target/release/backend
 ```
 Ensure your production environment has the necessary environment variables set (e.g., `DATABASE_URL`).
 
