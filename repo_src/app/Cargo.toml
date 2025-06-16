@@ -7,10 +7,11 @@ edition = "2021"
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-leptos = { version = "0.6", features = ["csr", "serde"] } # Remove nightly feature for stable compatibility
-leptos_meta = { version = "0.6", features = ["csr"] }
+# Base leptos without client-specific features
+leptos = { version = "0.6", default-features = false, features = ["serde"] }
+leptos_meta = { version = "0.6", default-features = false }
 leptos_axum = { version = "0.6", optional = true }
-leptos_router = { version = "0.6", features = ["csr"] }
+leptos_router = { version = "0.6", default-features = false }
 
 # Serde for serialization (needed for server functions)
 serde = { version = "1.0", features = ["derive"] }
@@ -41,8 +42,11 @@ web-sys = { version = "0.3", features = ["HtmlInputElement", "KeyboardEvent", "E
 [features]
 hydrate = [
     "leptos/hydrate",
+    "leptos/csr", 
     "leptos_meta/hydrate",
+    "leptos_meta/csr",
     "leptos_router/hydrate",
+    "leptos_router/csr",
     "dep:console_error_panic_hook",
     "dep:console_log",
     "dep:wasm-bindgen",
