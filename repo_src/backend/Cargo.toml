@@ -4,9 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-frontend = { path = "../frontend", features = ["ssr"] } # Depend on frontend with "ssr" feature
+frontend = { path = "../frontend", default-features = false, features = ["ssr"] } # Depend on frontend with "ssr" feature only
 leptos = { version = "0.6", default-features = false, features = ["ssr"] } # For get_configuration
-leptos_axum = { version = "0.6" }
+leptos_axum = { version = "0.6", default-features = false }
 axum = "0.7"
 tokio = { version = "1", features = ["rt-multi-thread"] }
 tower = "0.4"
