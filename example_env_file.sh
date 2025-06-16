@@ -7,6 +7,7 @@
 # Ensure the directory exists if it's a relative path, or use an absolute path.
 export DATABASE_URL="sqlite:./target/dev.db?mode=rwc"
 export RUST_BACKTRACE=0
+export LEPTOS_ENV=DEV
 
 # Leptos specific environment variables (optional, defaults are usually fine)
 # export LEPTOS_OUTPUT_NAME="my_leptos_app"

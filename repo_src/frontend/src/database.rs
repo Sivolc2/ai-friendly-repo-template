@@ -151,10 +151,27 @@ pub async fn seed_database() -> Result<(), String> {
                 leptos::logging::error!("[DB LOG] Error seeding item '{}': {}", item_text, e);
             }
         }
-        leptos::logging::log!("[DB LOG] Database seeding completed.");
+        leptos::logging::log!("[DB LOG] ✅ Database seeding completed successfully!");
     } else {
         leptos::logging::log!("[DB LOG] Database already has data ({} items). Skipping seeding.", count);
     }
+    Ok(())
+}
+
+// Force seed the database regardless of existing data (useful for testing or manual seeding)
+pub async fn force_seed_database() -> Result<(), String> {
+    leptos::logging::log!("[DB LOG] Force seeding database (will add items regardless of existing data)...");
+    let initial_items = vec![
+        "Buy groceries",
+        "Read a book", 
+        "Learn Leptos",
+    ];
+    for item_text in initial_items {
+        if let Err(e) = add_item_db(item_text.to_string()).await {
+            leptos::logging::error!("[DB LOG] Error force seeding item '{}': {}", item_text, e);
+        }
+    }
+    leptos::logging::log!("[DB LOG] ✅ Force database seeding completed!");
     Ok(())
 }
 

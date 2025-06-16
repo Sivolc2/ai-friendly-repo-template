@@ -114,6 +114,35 @@ It's designed to be AI-friendly, encouraging clear structure, good documentation
 
 Refer to `docs/guides/init.md` for the complete template creation guide and feature development workflow.
 
+## Database Seeding
+
+The application includes automatic database seeding to populate empty databases with initial data:
+
+### **Automatic Seeding**
+- **When:** Runs automatically after migrations during app startup
+- **Environment:** Only in development (`LEPTOS_ENV=DEV`, which is the default)
+- **Condition:** Only seeds if the items table is empty
+- **Initial Data:** Creates three sample items: "Buy groceries", "Read a book", "Learn Leptos"
+
+### **Manual Seeding Commands**
+You can also seed the database manually using command-line options:
+
+```bash
+# Seed database only if empty (same as automatic behavior)
+./target/release/backend --seed
+
+# Force seed database (adds items regardless of existing data)  
+./target/release/backend --force-seed
+
+# Show help for available commands
+./target/release/backend --help
+```
+
+### **Production Behavior**
+- Seeding is **disabled** in production environments (`LEPTOS_ENV=PROD`)
+- Migrations still run automatically in production
+- Use manual seeding commands if needed in production
+
 ## Building for Production
 (From the workspace root)
 ```bash
@@ -145,16 +174,17 @@ cargo test --workspace
 ✅ **Basic Template Complete:** The template compiles and builds successfully  
 ✅ **Workspace Configuration:** Leptos integrated at workspace level with proper feature separation  
 ✅ **Runtime Fixed:** Server starts without panics, proper LocalSet integration  
-🚧 **Feature Implementation:** Basic app structure is ready for feature development  
-📝 **Next Steps:** Implement the full CRUD functionality
+✅ **Database Integration:** Full database initialization, seeding, and testing implemented  
+📝 **Next Steps:** Implement the full CRUD functionality in frontend components
 
 ## Current Implementation
 
 The template currently includes:
 - ✅ Workspace structure with `frontend`, `backend`, and `shared` crates
 - ✅ Basic Leptos app component with "Hello, World!" placeholder
-- ✅ Database layer with SQLite setup and migrations
+- ✅ Database layer with SQLite setup, migrations, and seeding
 - ✅ Server function infrastructure (placeholder implementations)
+- ✅ Comprehensive testing framework for database and server functions
 - ✅ Component structure (item form and list placeholders)  
 - ✅ CSS styling framework
 - ✅ Build system configuration
@@ -190,6 +220,7 @@ The template currently includes:
 - Verify `DATABASE_URL` is set in `.env` file
 - Check that the target directory exists for SQLite file creation
 - Run migrations manually if auto-migration fails: `sqlx migrate run --source repo_src/frontend/migrations`
+- Use manual seeding commands if needed: `./target/release/backend --seed`
 
 **Runtime Issues:**
 - If you see `spawn_local` errors, ensure `leptos_axum` uses default features in `backend/Cargo.toml`
@@ -197,4 +228,4 @@ The template currently includes:
 
 ## License
 
-This template is provided as-is for educational and development purposes. 
+This template is provided as-is for educational and development purposes.

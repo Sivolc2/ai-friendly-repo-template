@@ -10,6 +10,71 @@ async fn main() {
     use tower_http::services::ServeDir;
     use tokio::task::LocalSet;
 
+    // Check for command line arguments
+    let args: Vec<String> = std::env::args().collect();
+    if args.len() > 1 {
+        match args[1].as_str() {
+            "--seed" => {
+                println!("🌱 Manual database seeding requested...");
+                
+                // Load .env file before database operations
+                match dotenvy::dotenv() {
+                    Ok(path) => println!("📄 Loaded .env file from: {:?}", path),
+                    Err(_) => println!("⚠️  No .env file found. Using environment variables directly."),
+                }
+                
+                // Run seeding in a LocalSet
+                let local = LocalSet::new();
+                local.run_until(async move {
+                    match frontend::database::seed_database().await {
+                        Ok(_) => println!("✅ Manual database seeding completed successfully!"),
+                        Err(e) => {
+                            println!("❌ Manual database seeding failed: {}", e);
+                            std::process::exit(1);
+                        }
+                    }
+                }).await;
+                return;
+            }
+            "--force-seed" => {
+                println!("🌱 Force database seeding requested (will add items regardless of existing data)...");
+                
+                // Load .env file before database operations
+                match dotenvy::dotenv() {
+                    Ok(path) => println!("📄 Loaded .env file from: {:?}", path),
+                    Err(_) => println!("⚠️  No .env file found. Using environment variables directly."),
+                }
+                
+                // Run force seeding in a LocalSet
+                let local = LocalSet::new();
+                local.run_until(async move {
+                    match frontend::database::force_seed_database().await {
+                        Ok(_) => println!("✅ Force database seeding completed successfully!"),
+                        Err(e) => {
+                            println!("❌ Force database seeding failed: {}", e);
+                            std::process::exit(1);
+                        }
+                    }
+                }).await;
+                return;
+            }
+            "--help" | "-h" => {
+                println!("Leptos Full-Stack Web Application");
+                println!("\nUsage:");
+                println!("  ./backend              Start the web server");
+                println!("  ./backend --seed       Seed the database with initial data (only if empty)");
+                println!("  ./backend --force-seed Force seed the database (adds data regardless)");
+                println!("  ./backend --help       Show this help message");
+                return;
+            }
+            _ => {
+                println!("❌ Unknown argument: {}", args[1]);
+                println!("Use --help for available options.");
+                std::process::exit(1);
+            }
+        }
+    }
+
     // Load .env file from the workspace root (repo_src/.env)
     // This needs to happen before any database connection attempts if DB_URL is in .env
     match dotenvy::dotenv() {
@@ -60,10 +125,12 @@ async fn main() {
             // Conditionally seed the database in development environments
             let leptos_env = std::env::var("LEPTOS_ENV").unwrap_or_else(|_| "PROD".to_string());
             if leptos_env == "DEV" {
-                logging::log!("Development environment detected (LEPTOS_ENV=DEV). Attempting to seed database...");
+                logging::log!("🌱 Development environment detected (LEPTOS_ENV=DEV). Attempting to seed database...");
                 if let Err(e) = frontend::database::seed_database().await {
                     logging::error!("Failed to seed database: {:?}", e);
                     // Decide if this is a fatal error. For seeding, perhaps not.
+                } else {
+                    logging::log!("🌱 Automatic database seeding check completed.");
                 }
             } else {
                 logging::log!("Production-like environment (LEPTOS_ENV is not DEV). Skipping database seeding.");
