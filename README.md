@@ -11,7 +11,7 @@ It's designed to be AI-friendly, encouraging clear structure, good documentation
 *   **Axum Backend:** Integrated via `cargo-leptos` for serving the application and handling API requests (through Leptos server functions).
 *   **SQLx & SQLite:** Asynchronous SQL toolkit with compile-time query checking. SQLite is used for easy setup.
 *   **Hot Reloading:** `cargo leptos watch` provides a fast development loop.
-*   **Monorepo Structure:** Clear separation of concerns with `app` and `shared` crates.
+*   **Workspace Structure:** Clear separation of concerns with `frontend`, `backend`, and `shared` crates.
 *   **Basic CRUD Example:** A simple item list manager demonstrates database interaction and frontend reactivity.
 *   **Environment Configuration:** Uses `.env` files for managing settings like database URLs.
 *   **Clear Documentation:** Guidelines for setup, development, and testing.
@@ -22,7 +22,7 @@ It's designed to be AI-friendly, encouraging clear structure, good documentation
 .
 ├── example_env_file.sh  # Example environment variables (copy to .env)
 ├── .gitignore
-├── Cargo.toml           # Workspace root
+├── Cargo.toml           # Workspace root with Leptos configuration
 ├── README.md            # This file
 ├── README.testing.md    # Testing guidelines
 ├── rust-toolchain.toml  # Specifies Rust toolchain version
@@ -30,21 +30,24 @@ It's designed to be AI-friendly, encouraging clear structure, good documentation
 │   └── guides/
 │       └── init.md      # Complete template creation guide
 └── repo_src/
-    ├── app/             # Main Leptos application (FE & BE logic)
+    ├── frontend/        # Leptos frontend application
     │   ├── Cargo.toml
     │   ├── index.html     # Main HTML file for Leptos
     │   ├── migrations/    # SQLx migrations (e.g., 0001_create_items_table.sql)
     │   ├── public/        # Static assets directory
-    │   ├── src/           # Source code for the app
+    │   ├── src/           # Frontend source code
     │   │   ├── app_component.rs
     │   │   ├── components/
-    │   │   ├── database.rs
+    │   │   ├── database.rs      # Server-side database functions (SSR feature)
     │   │   ├── error_template.rs
     │   │   ├── lib.rs
-    │   │   ├── main.rs
-    │   │   └── server_fns.rs
+    │   │   └── server_fns.rs    # Leptos server functions
     │   └── style/
     │       └── main.css
+    ├── backend/         # Axum server binary
+    │   ├── Cargo.toml
+    │   └── src/
+    │       └── main.rs    # Server startup and configuration
     └── shared/          # Shared data types (DTOs)
         ├── Cargo.toml
         └── src/
@@ -76,7 +79,6 @@ It's designed to be AI-friendly, encouraging clear structure, good documentation
 
 3.  **Build the application:**
     ```bash
-    cd repo_src/app
     cargo leptos build
     ```
 
@@ -89,12 +91,15 @@ It's designed to be AI-friendly, encouraging clear structure, good documentation
 
 ## Development Workflow
 
-*   **Modify Code:** Make changes to files in `repo_src/app/src/` for application logic/UI, or `repo_src/shared/src/` for shared types.
-*   **Server Functions:** Define backend logic accessible from the frontend in `repo_src/app/src/server_fns.rs`.
-*   **Database Interactions:** Manage database logic in `repo_src/app/src/database.rs`.
-*   **Styling:** Add CSS to `repo_src/app/style/main.css`. Ensure it's linked in `repo_src/app/index.html`.
+*   **Frontend Logic:** Modify files in `repo_src/frontend/src/` for UI components and client-side logic.
+*   **Server Functions:** Define backend API endpoints in `repo_src/frontend/src/server_fns.rs`.
+*   **Database Interactions:** Manage database logic in `repo_src/frontend/src/database.rs` (compiled only with SSR feature).
+*   **Backend Configuration:** Server startup and configuration in `repo_src/backend/src/main.rs`.
+*   **Shared Types:** Add shared data structures in `repo_src/shared/src/lib.rs`.
+*   **Styling:** Add CSS to `repo_src/frontend/style/main.css`. Ensure it's linked in `repo_src/frontend/index.html`.
 *   **Adding Dependencies:**
-    *   For the main app: `cargo add <crate_name> -p app`
+    *   For the frontend: `cargo add <crate_name> -p frontend`
+    *   For the backend: `cargo add <crate_name> -p backend`
     *   For shared types: `cargo add <crate_name> -p shared`
 
 Refer to `docs/guides/init.md` for the complete template creation guide and feature development workflow.
@@ -102,7 +107,6 @@ Refer to `docs/guides/init.md` for the complete template creation guide and feat
 ## Building for Production
 
 ```bash
-cd repo_src/app
 cargo leptos build --release
 ```
 This will create an optimized build in the `target/release` directory for the server binary and `target/site` for the frontend assets (WASM, JS glue, CSS).
@@ -111,7 +115,7 @@ This will create an optimized build in the `target/release` directory for the se
 
 After building, you can run the server binary:
 ```bash
-./target/release/app  # From the app directory
+./target/release/backend  # Server binary name matches backend crate
 ```
 Ensure your production environment has the necessary environment variables set (e.g., `DATABASE_URL`).
 
@@ -126,25 +130,41 @@ cargo test --workspace
 ## Template Status
 
 ✅ **Basic Template Complete:** The template compiles and builds successfully  
+✅ **Workspace Configuration:** Leptos integrated at workspace level with proper feature separation  
+✅ **Runtime Fixed:** Server starts without panics, proper LocalSet integration  
 🚧 **Feature Implementation:** Basic app structure is ready for feature development  
 📝 **Next Steps:** Implement the full CRUD functionality
 
 ## Current Implementation
 
 The template currently includes:
-- ✅ Workspace structure with `app` and `shared` crates
+- ✅ Workspace structure with `frontend`, `backend`, and `shared` crates
 - ✅ Basic Leptos app component with "Hello, World!" placeholder
 - ✅ Database layer with SQLite setup and migrations
 - ✅ Server function infrastructure (placeholder implementations)
 - ✅ Component structure (item form and list placeholders)  
 - ✅ CSS styling framework
 - ✅ Build system configuration
+- ✅ Proper feature separation (hydrate for client, ssr for server)
+- ✅ Working development server with hot reload
 
 **Next Development Steps:**
 1. Implement full CRUD functionality in components
 2. Connect frontend components to server functions
 3. Add proper error handling and validation
 4. Implement database operations for items
+
+## Architecture Notes
+
+**Feature Separation:**
+- **Frontend crate:** Uses `hydrate` feature for client-side builds (WASM), `ssr` feature for server-side compilation
+- **Backend crate:** Depends on frontend with `ssr` feature only, no WASM dependencies
+- **Shared crate:** Pure Rust types, no framework dependencies
+
+**Build Process:**
+- `cargo leptos build` builds both client (WASM) and server binaries
+- Client build: `frontend` crate with `hydrate` features → WASM bundle
+- Server build: `backend` crate pulling `frontend` with `ssr` features → native binary
 
 ## Troubleshooting
 
@@ -156,7 +176,11 @@ The template currently includes:
 **Database Issues:**
 - Verify `DATABASE_URL` is set in `.env` file
 - Check that the target directory exists for SQLite file creation
-- Run migrations manually if auto-migration fails: `sqlx migrate run --source repo_src/app/migrations`
+- Run migrations manually if auto-migration fails: `sqlx migrate run --source repo_src/frontend/migrations`
+
+**Runtime Issues:**
+- If you see `spawn_local` errors, ensure `leptos_axum` uses default features in `backend/Cargo.toml`
+- For WASM compilation errors on server, verify `frontend` dependency has `default-features = false` in `backend/Cargo.toml`
 
 ## License
 
