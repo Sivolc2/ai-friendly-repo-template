@@ -5,8 +5,9 @@ async fn main() {
     use leptos::*;
     use leptos_axum::{generate_route_list, LeptosRoutes};
     use app::app_component::AppComponent; // Use the renamed component
-    use app::error_template::ErrorTemplate;
     use tower_http::services::ServeDir;
+    
+    #[cfg(feature = "DATABASE_AUTO_MIGRATE")]
     use app::database; // For migrations
 
     // Load .env file if present

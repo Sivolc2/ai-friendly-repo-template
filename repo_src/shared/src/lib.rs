@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use chrono::{DateTime, Utc, NaiveDateTime};
+use chrono::NaiveDateTime;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Item {

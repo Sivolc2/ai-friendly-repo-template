@@ -1,4 +1,3 @@
-use leptos::*;
 pub mod app_component;
 pub mod components;
 pub mod error_template;
@@ -13,6 +12,7 @@ pub mod database; // For server-side logic, accessible in server_fns
 #[cfg(feature = "hydrate")]
 #[wasm_bindgen::prelude::wasm_bindgen]
 pub fn hydrate() {
+    use leptos::*;
     use app_component::AppComponent;
     use leptos_meta::provide_meta_context;
 
