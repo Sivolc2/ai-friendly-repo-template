@@ -1,0 +1,73 @@
+[package]
+name = "frontend"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+# Base leptos without client-specific features
+leptos = { version = "0.6", default-features = false, features = ["serde"] }
+leptos_meta = { version = "0.6", default-features = false }
+leptos_router = { version = "0.6", default-features = false }
+
+# Serde for serialization (needed for server functions)
+serde = { version = "1.0", features = ["derive"] }
+
+# Logging
+log = "0.4"
+
+# Shared types
+shared = { path = "../shared" }
+
+# Client-side (CSR/WASM) specific dependencies (optional = true, enabled by "hydrate" feature)
+console_error_panic_hook = { version = "0.1.7", optional = true }
+console_log = { version = "1.0", optional = true }
+wasm-bindgen = { version = "0.2.92", optional = true }
+web-sys = { version = "0.3", features = ["HtmlInputElement", "KeyboardEvent", "Event", "SubmitEvent"], optional = true }
+
+# Server-side (SSR) specific dependencies for server_fns & database.rs (optional = true, enabled by "ssr" feature)
+# These are needed because server_fns and database.rs are part of the frontend crate,
+# but their actual logic is compiled only when the "ssr" feature is active (i.e., when building the backend).
+sqlx = { version = "0.7", features = ["runtime-tokio", "sqlite", "macros", "chrono", "uuid"], optional = true }
+dotenvy = { version = "0.15", optional = true }
+thiserror = { version = "1.0", optional = true }
+http = { version = "1.0", optional = true } # For ServerFnError, which uses http::StatusCode
+chrono = { version = "0.4", features = ["serde"], optional = true } # For timestamps in server fns if not handled by shared
+
+[features]
+default = ["hydrate"] # Default for client-side builds (WASM)
+
+hydrate = [
+    "leptos/hydrate",
+    "leptos/csr",
+    "leptos_meta/hydrate",
+    "leptos_meta/csr",
+    "leptos_router/hydrate",
+    "leptos_router/csr",
+    "dep:console_error_panic_hook",
+    "dep:console_log",
+    "dep:wasm-bindgen",
+    "dep:web-sys",
+]
+
+ssr = [
+    "leptos/ssr",
+    "leptos_meta/ssr",
+    "leptos_router/ssr",
+    "dep:sqlx",
+    "dep:dotenvy",
+    "dep:thiserror",
+    "dep:http",
+    "dep:chrono", # Enable chrono if server fns use it directly beyond shared types
+    # Any other deps needed by server_fns.rs or database.rs
+]
+
+# Feature to enable automatic database migrations on server startup
+# This feature should be enabled by the backend crate when it builds.
+DATABASE_AUTO_MIGRATE = ["ssr"] # Depends on ssr because migrations run on server side logic
+
+[dev-dependencies]
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+wasm-bindgen-test = "0.3.42" 

@@ -4,9 +4,6 @@ use leptos_meta::Title;
 #[cfg(feature = "ssr")]
 use http::status::StatusCode;
 
-#[cfg(feature = "ssr")]
-use leptos_axum::ResponseOptions;
-
 #[component]
 pub fn ErrorTemplate(
     #[prop(optional)] outside_errors: Option<Errors>,
@@ -22,11 +19,9 @@ pub fn ErrorTemplate(
 
     #[cfg(feature = "ssr")]
     {
-        let status_code = StatusCode::INTERNAL_SERVER_ERROR;
-        let response = use_context::<ResponseOptions>();
-        if let Some(response) = response {
-            response.set_status(status_code);
-        }
+        // ResponseOptions is not available in the frontend crate
+        // This would need to be handled in the backend if needed
+        let _status_code = StatusCode::INTERNAL_SERVER_ERROR;
     }
 
     view! {

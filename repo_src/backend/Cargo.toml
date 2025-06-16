@@ -1,0 +1,22 @@
+[package]
+name = "backend"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+frontend = { path = "../frontend", features = ["ssr"] } # Depend on frontend with "ssr" feature
+leptos = { version = "0.6", default-features = false, features = ["ssr"] } # For get_configuration
+leptos_axum = { version = "0.6" }
+axum = "0.7"
+tokio = { version = "1", features = ["rt-multi-thread"] }
+tower = "0.4"
+tower-http = { version = "0.5", features = ["fs"] }
+dotenvy = "0.15" # For loading .env at startup
+log = "0.4" # For logging startup messages
+
+# This feature allows backend to enable migrations in frontend
+[features]
+default = ["DATABASE_AUTO_MIGRATE"] # Enable migrations by default for dev server
+# This feature, when enabled for the backend crate, will also enable
+# `DATABASE_AUTO_MIGRATE` in the `frontend` crate.
+DATABASE_AUTO_MIGRATE = ["frontend/DATABASE_AUTO_MIGRATE"] 

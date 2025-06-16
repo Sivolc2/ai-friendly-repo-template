@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use chrono::NaiveDateTime;
 
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct Item {
     pub id: i64,
     pub text: String,

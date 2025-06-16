@@ -67,33 +67,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e16d2d3311acee920a9eb8d33b8cbc1787ce4a264e85f964c2404b969bdcd487"
 
 [[package]]
-name = "app"
-version = "0.1.0"
-dependencies = [
- "axum",
- "chrono",
- "console_error_panic_hook",
- "console_log",
- "dotenvy",
- "http",
- "leptos",
- "leptos_axum",
- "leptos_meta",
- "leptos_router",
- "log",
- "serde",
- "shared",
- "sqlx",
- "thiserror",
- "tokio",
- "tower 0.4.13",
- "tower-http",
- "wasm-bindgen",
- "wasm-bindgen-test",
- "web-sys",
-]
-
-[[package]]
 name = "async-recursion"
 version = "1.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -214,6 +187,21 @@ dependencies = [
  "tower-layer",
  "tower-service",
  "tracing",
+]
+
+[[package]]
+name = "backend"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "dotenvy",
+ "frontend",
+ "leptos",
+ "leptos_axum",
+ "log",
+ "tokio",
+ "tower 0.4.13",
+ "tower-http",
 ]
 
 [[package]]
@@ -701,6 +689,29 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e13624c2627564efccf4934284bdd98cbaa14e79b0b5a141218e507b3a823456"
 dependencies = [
  "percent-encoding",
+]
+
+[[package]]
+name = "frontend"
+version = "0.1.0"
+dependencies = [
+ "chrono",
+ "console_error_panic_hook",
+ "console_log",
+ "dotenvy",
+ "http",
+ "leptos",
+ "leptos_meta",
+ "leptos_router",
+ "log",
+ "serde",
+ "shared",
+ "sqlx",
+ "thiserror",
+ "tokio",
+ "wasm-bindgen",
+ "wasm-bindgen-test",
+ "web-sys",
 ]
 
 [[package]]
