@@ -32,6 +32,7 @@ else:
 from repo_src.backend.database.setup import init_db
 from repo_src.backend.database import models, connection # For example endpoints
 from repo_src.backend.functions.items import router as items_router # Import the items router
+from repo_src.backend.routers.chat import router as chat_router # Import the chat router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -56,8 +57,9 @@ app.add_middleware(
     allow_headers=["*"],  # Allow all headers
 )
 
-# Include the items router
+# Include routers
 app.include_router(items_router)
+app.include_router(chat_router)
 
 @app.get("/")
 async def read_root():
