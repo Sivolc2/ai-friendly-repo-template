@@ -1,0 +1,157 @@
+{
+  "$schema": "https://schema.ai-friendly-cloud-infra.platform/service/v1",
+  "service_name": "ai-friendly-repo-template",
+  "version": "1.0.0",
+  "description": "A framework for collaborative content creation and management with AI-driven, functional-core architecture",
+  "type": "web-application",
+  "architecture": {
+    "components": [
+      {
+        "name": "backend",
+        "type": "api",
+        "runtime": "python",
+        "framework": "fastapi",
+        "path": "repo_src/backend",
+        "entrypoint": "main.py",
+        "port": 8000
+      },
+      {
+        "name": "frontend",
+        "type": "spa",
+        "runtime": "node",
+        "framework": "react",
+        "path": "repo_src/frontend",
+        "port": 3000
+      }
+    ]
+  },
+  "requirements": {
+    "cpu": "0.5",
+    "memory": "1024",
+    "storage": "10GB",
+    "min_instances": 1,
+    "max_instances": 5
+  },
+  "dependencies": {
+    "postgres": true,
+    "redis": false,
+    "s3": true,
+    "vector_db": false
+  },
+  "cloud_adapters": {
+    "database": {
+      "local": "sqlite",
+      "cloud": "postgres",
+      "adapter_path": "repo_src/backend/adapters/database.py"
+    },
+    "storage": {
+      "local": "filesystem",
+      "cloud": "s3",
+      "adapter_path": "repo_src/backend/adapters/storage.py"
+    }
+  },
+  "env_vars": {
+    "required": [
+      "DATABASE_URL",
+      "API_PORT",
+      "FRONTEND_URL"
+    ],
+    "optional": [
+      "REDIS_URL",
+      "S3_BUCKET_NAME",
+      "LOG_LEVEL",
+      "CORS_ORIGINS"
+    ],
+    "secrets": [
+      "DATABASE_PASSWORD",
+      "API_SECRET_KEY",
+      "AWS_ACCESS_KEY_ID",
+      "AWS_SECRET_ACCESS_KEY"
+    ]
+  },
+  "networking": {
+    "ingress": {
+      "public": true,
+      "paths": [
+        {
+          "path": "/api/*",
+          "target": "backend",
+          "port": 8000
+        },
+        {
+          "path": "/*",
+          "target": "frontend",
+          "port": 3000
+        }
+      ]
+    },
+    "egress": {
+      "allowed_domains": [
+        "*.amazonaws.com",
+        "*.openai.com",
+        "*.anthropic.com"
+      ]
+    }
+  },
+  "health_checks": {
+    "backend": {
+      "path": "/health",
+      "interval": 30,
+      "timeout": 5,
+      "healthy_threshold": 2,
+      "unhealthy_threshold": 3
+    },
+    "frontend": {
+      "path": "/",
+      "interval": 30,
+      "timeout": 5,
+      "healthy_threshold": 2,
+      "unhealthy_threshold": 3
+    }
+  },
+  "deployment": {
+    "strategy": "rolling",
+    "rollback_on_failure": true,
+    "pre_deploy_commands": [
+      "pnpm install",
+      "pnpm build"
+    ],
+    "post_deploy_commands": [
+      "python repo_src/backend/database/migrations/run.py"
+    ]
+  },
+  "monitoring": {
+    "metrics": true,
+    "logging": {
+      "level": "info",
+      "retention_days": 30
+    },
+    "alerts": [
+      {
+        "name": "high_error_rate",
+        "condition": "error_rate > 5%",
+        "action": "notify"
+      },
+      {
+        "name": "high_latency",
+        "condition": "p95_latency > 1000ms",
+        "action": "notify"
+      }
+    ]
+  },
+  "compliance": {
+    "requirements": [
+      "no_embedded_secrets",
+      "dockerfile_present",
+      "cloud_tests_passing",
+      "deployment_docs_present"
+    ]
+  },
+  "metadata": {
+    "team": "platform-engineering",
+    "contact": "platform@example.com",
+    "documentation": "docs/deployment.md",
+    "repository": "https://github.com/Sivolc2/ai-friendly-repo-template",
+    "ci_cd": "github-actions"
+  }
+}

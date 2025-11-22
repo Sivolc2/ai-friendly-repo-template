@@ -1,1 +1,163 @@
-[]
+{
+  "project": {
+    "name": "AI-Friendly Repository Template",
+    "version": "1.0.0",
+    "description": "A framework for collaborative content creation and management with AI-driven, functional-core architecture",
+    "type": "full-stack-web-application",
+    "architecture_pattern": "functional-core-imperative-shell"
+  },
+  "components": {
+    "backend": {
+      "language": "Python",
+      "framework": "FastAPI",
+      "version": "3.11",
+      "main_entry": "repo_src/backend/main.py",
+      "key_directories": {
+        "adapters": "repo_src/backend/adapters",
+        "functions": "repo_src/backend/functions",
+        "pipelines": "repo_src/backend/pipelines",
+        "data": "repo_src/backend/data",
+        "tests": "repo_src/backend/tests"
+      },
+      "dependencies": "repo_src/backend/requirements.txt"
+    },
+    "frontend": {
+      "language": "TypeScript",
+      "framework": "React + Vite",
+      "version": "18.x",
+      "main_entry": "repo_src/frontend/src/main.tsx",
+      "key_directories": {
+        "components": "repo_src/frontend/src/components",
+        "hooks": "repo_src/frontend/src/hooks",
+        "pages": "repo_src/frontend/src/pages",
+        "services": "repo_src/frontend/src/services",
+        "types": "repo_src/frontend/src/types"
+      },
+      "dependencies": "repo_src/frontend/package.json"
+    }
+  },
+  "deployment": {
+    "branches": {
+      "main": {
+        "purpose": "Local development",
+        "database": "SQLite",
+        "storage": "Local Filesystem",
+        "optimization": "Speed and simplicity"
+      },
+      "cloud-main": {
+        "purpose": "Cloud production deployment",
+        "database": "PostgreSQL",
+        "storage": "AWS S3",
+        "optimization": "Scalability and reliability",
+        "contract": "deployment/service.json",
+        "containerization": "Dockerfile",
+        "documentation": "docs/deployment.md"
+      }
+    },
+    "platform_integration": {
+      "architecture": "AI-Friendly Cloud Infrastructure Federation",
+      "integration_method": "Git Submodule",
+      "validation_rules": [
+        "Contract exists (deployment/service.json)",
+        "Container builds successfully",
+        "No embedded secrets",
+        "Cloud adapter tests pass",
+        "Documentation present"
+      ]
+    }
+  },
+  "ai_context": {
+    "development_philosophy": "Functional core with imperative shell for clear separation of concerns",
+    "ai_friendly_features": [
+      "Comprehensive documentation in docs/",
+      "Context files in registry/",
+      "Clear architectural boundaries",
+      "Pure functions in functions/ directory",
+      "Adapter pattern for external dependencies",
+      "README files in each major directory"
+    ],
+    "contribution_workflow": [
+      "Read docs/feature_flow.md",
+      "Review registry context files",
+      "Develop with functional-core pattern",
+      "Update documentation as you code",
+      "Follow testing patterns"
+    ]
+  },
+  "infrastructure_requirements": {
+    "compute": {
+      "cpu": "0.5 vCPU",
+      "memory": "1024 MB",
+      "storage": "10 GB"
+    },
+    "dependencies": {
+      "database": {
+        "type": "PostgreSQL",
+        "version": "14+",
+        "required": true
+      },
+      "object_storage": {
+        "type": "S3-compatible",
+        "required": true
+      },
+      "cache": {
+        "type": "Redis",
+        "required": false,
+        "future": true
+      }
+    },
+    "networking": {
+      "ports": {
+        "backend": 8000,
+        "frontend": 3000
+      },
+      "ingress": "Public with load balancer",
+      "egress": [
+        "AWS services",
+        "OpenAI API",
+        "Anthropic API"
+      ]
+    }
+  },
+  "monitoring": {
+    "health_checks": {
+      "backend": "/health",
+      "frontend": "/"
+    },
+    "metrics": [
+      "Request rate and latency",
+      "Error rate",
+      "Resource utilization",
+      "Database connection pool"
+    ],
+    "logging": {
+      "format": "JSON structured logs",
+      "retention": "30 days"
+    }
+  },
+  "compliance": {
+    "security": [
+      "No embedded secrets",
+      "Non-root container execution",
+      "Minimal base images",
+      "Secrets injected at runtime"
+    ],
+    "deployment": [
+      "Health checks implemented",
+      "Graceful shutdown",
+      "Database migrations automated",
+      "Rollback capability"
+    ]
+  },
+  "metadata": {
+    "repository": "https://github.com/Sivolc2/ai-friendly-repo-template",
+    "documentation": {
+      "main": "README.md",
+      "deployment": "docs/deployment.md",
+      "architecture": "docs/context/",
+      "guides": "docs/guides/"
+    },
+    "team": "Platform Engineering",
+    "license": "ISC"
+  }
+}
